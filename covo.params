@@ -1,0 +1,69 @@
+
+# input catalogues
+fname_cat_1 = ./catalogues/random_1.csv
+fname_cat_2 = ./catalogues/random_2.csv
+
+
+# variables for output filename
+# (set fname_out = auto to generate filename from prefix, suffix and extension)
+fname_out = auto
+fname_out_prefix = w
+fname_out_suffix = test
+fname_out_extention = csv
+
+
+dir_out = ./results/
+
+
+# delimiter for input catalogue ad output file
+# (tab for "\t", space for " ", anything else will be used directly)
+delim_in = ,
+delim_out = space
+
+
+# add header to output file
+header_out = true
+
+
+# columns for positions and vectors in input file
+cols_pos = 0,1,2
+cols_vec_a = 3,4,5
+cols_vec_b = 6,7,8
+
+
+# combinations for which to compute inner product correlations
+r12_v1a = true
+r12_v1b = true
+r12_v2a = true
+r12_v2b = true
+v1a_v2a = true
+v1b_v2b = true
+v1a_v2b = true
+v1b_v2a = true
+
+
+# set zero for silence
+verbose = 2
+
+
+# jack-knife samples per axis
+numb_jk  = 4,4,4
+
+
+# binning
+r_min = 0.1
+r_max = 20
+numb_bin = 10
+lg_bins = true
+
+
+# random catalogue
+
+make_rand = false
+rand_seed = 999
+fname_rand = ./catalogues/random_1.csv
+
+numb_rand = 10000
+xlim_rand = 0,100
+ylim_rand = 0,100
+zlim_rand = 0,100
