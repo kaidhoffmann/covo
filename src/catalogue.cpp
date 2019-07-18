@@ -234,10 +234,11 @@ void catalogue::make_samples(std::vector < int > & numb_jk){
             for(int k = 0; k < numb_jk[2]; k++){
                 
                 std::vector <double> center = {
-                    (i+0.5)*Lcell[0]-pos_limits[0][0],
-                    (j+0.5)*Lcell[1]-pos_limits[1][0],
-                    (k+0.5)*Lcell[2]-pos_limits[2][0]};
-                
+                    (i+0.5)*Lcell[0]-fabs(pos_limits[0][0]),
+                    (j+0.5)*Lcell[1]-fabs(pos_limits[1][0]),
+                    (k+0.5)*Lcell[2]-fabs(pos_limits[2][0])};
+
+                    
                 int ID = pos_to_ID(numb_jk, center, pos_limits, Lcell);
                 
                 samp[ID].cent = center;
