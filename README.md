@@ -5,7 +5,7 @@ computes the average inner product of vector pairs as a function of their distan
 ---
 
 ## compile
-$ cd src \
+$ cd src  
 $ make
 
 
