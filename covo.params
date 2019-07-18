@@ -15,7 +15,7 @@ fname_out_extention = csv
 dir_out = ./results/
 
 
-# delimiter for input catalogue ad output file
+# delimiter for input catalogue and output file
 # (tab for "\t", space for " ", anything else will be used directly)
 delim_in = ,
 delim_out = space
