@@ -97,8 +97,8 @@ int main(int argc, char **argv){
     cat_2.normalize_vectors();
     
     //make jack-knife samples
-    cat_1.make_samples(p.numb_jk);
-    cat_2.make_samples(p.numb_jk);
+    cat_1.make_samples_cart(p.numb_jk);
+    cat_2.make_samples_cart(p.numb_jk);
     
     
     //delete original input catalogue to free memory

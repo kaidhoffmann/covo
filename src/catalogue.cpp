@@ -37,17 +37,14 @@ void catalogue::normalize_vectors(){
 }
 
 
-
 // ==========================================================
 // read catalogue from ascii file
 // ==========================================================
 void catalogue::read(const parameters p, const std::string filename){
-
     
     std::ifstream indata;
     indata.open(filename.c_str());
     
-
     if(!indata.is_open()){
         std::cout<<"##### ERROR [read_cat]: can't open: " << filename <<" #####"<<std::endl;
         exit (EXIT_FAILURE);
@@ -134,7 +131,7 @@ std::vector < std::vector < double > > catalogue::limits(sample smp){
 // convert cellID to grid coordinates
 //===========================================================
 //WARNING: max cells per axis = (4294967295)^(1÷3) = 1625
-// void ID_to_pos(const unsigned long ID, const int DIM, int pos[3]){
+// void ID_to_pos(const unsigned long ID, const int DIM, int pos[3]){ 
 //     
 //     pos[2] = int(ID / DIM / DIM);
 //     pos[1] = int(ID / DIM) - pos[2]*DIM;
@@ -147,7 +144,7 @@ std::vector < std::vector < double > > catalogue::limits(sample smp){
 // convert cellID to grid coordinates
 //===========================================================
 //WARNING: max cells per axis = (4294967295)^(1÷3) = 1625
-// unsigned long pos_to_ID(const int DIM, const int I, const int J, const int K){    
+// unsigned long pos_to_ID_cart(const int DIM, const int I, const int J, const int K){    
 //     return I + J*DIM + K*DIM*DIM;
 // }
 
@@ -156,7 +153,7 @@ std::vector < std::vector < double > > catalogue::limits(sample smp){
 // ==========================================================
 // obtain cell ID for object from its position
 // ==========================================================
-int catalogue::pos_to_ID(
+int catalogue::pos_to_ID_cart(
     const std::vector < int > & numb_jk,
     const std::vector < double > & pos,
     const std::vector < std::vector < double > > & pos_limits,
@@ -190,9 +187,9 @@ int catalogue::pos_to_ID(
 // ==========================================================
 // put objects into samples
 // - samples build 3d grid mesh, spannig the the volume covered by the input catalogue
-// - should be used for data in box. Light cone samplin still needs to be added
+// - should be used for data in box.
 // ==========================================================
-void catalogue::make_samples(std::vector < int > & numb_jk){
+void catalogue::make_samples_cart(std::vector < int > & numb_jk){
 
     
     //total number of samples
@@ -223,7 +220,7 @@ void catalogue::make_samples(std::vector < int > & numb_jk){
     
     //add objects to samples
     for(int i=0; i<input.obj.size();i++){
-        int ID = pos_to_ID(numb_jk, input.obj[i].pos, pos_limits, Lcell);
+        int ID = pos_to_ID_cart(numb_jk, input.obj[i].pos, pos_limits, Lcell);
         samp[ID].obj.push_back(input.obj[i]);
     }
     
@@ -239,7 +236,7 @@ void catalogue::make_samples(std::vector < int > & numb_jk){
                     (k+0.5)*Lcell[2]-fabs(pos_limits[2][0])};
 
                     
-                int ID = pos_to_ID(numb_jk, center, pos_limits, Lcell);
+                int ID = pos_to_ID_cart(numb_jk, center, pos_limits, Lcell);
                 
                 samp[ID].cent = center;
                 

@@ -1,0 +1,13 @@
+./src/results/
+
+./src/catalogue.o
+
+./src/correlation.o
+
+./src/directory.o
+
+./src/parameters.o
+
+./src/main.o
+
+./covo

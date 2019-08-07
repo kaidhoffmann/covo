@@ -13,7 +13,7 @@
 class catalogue{
     
                       
-    int pos_to_ID(
+    int pos_to_ID_cart(
         const std::vector < int > & numb_jk,
         const std::vector < double > & pos,
         const std::vector < std::vector < double > > & pos_limits,
@@ -51,7 +51,7 @@ class catalogue{
     
     void normalize_vectors();
    
-    void make_samples(std::vector < int > & numb_jk);
+    void make_samples_cart(std::vector < int > & numb_jk);
     
     void delete_input();
 
