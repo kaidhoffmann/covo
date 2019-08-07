@@ -186,7 +186,7 @@ int catalogue::pos_to_ID_cart(
 
 // ==========================================================
 // put objects into samples
-// - samples build 3d grid mesh, spannig the the volume covered by the input catalogue
+// - samples build using 3d grid mesh, spannig the the volume covered by the input catalogue
 // - should be used for data in box.
 // ==========================================================
 void catalogue::make_samples_cart(std::vector < int > & numb_jk){
@@ -261,6 +261,19 @@ void catalogue::make_samples_cart(std::vector < int > & numb_jk){
         }
     }
 }
+
+
+// ==========================================================
+// put objects into samples
+// - samples build using healpix mesh
+// - should be used for data in sphere.
+// ==========================================================
+void catalogue::make_samples_healpix(std::vector < int > & nside){
+    
+    
+}
+
+
 
 
 

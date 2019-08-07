@@ -52,6 +52,8 @@ class catalogue{
     void normalize_vectors();
    
     void make_samples_cart(std::vector < int > & numb_jk);
+
+    void make_samples_healpix(std::vector < int > & nside);
     
     void delete_input();
 
