@@ -271,45 +271,45 @@ void correlation::sum_up_sample_combinations(const parameters p){
     for(int i=0; i < sums_samps.size(); i++){
         for(int j=0; j < sums_samps[i].size(); j++){
 
-            sum_vectors_int(p, res.total.counts, sums_samps[i][j].counts);
+            sum_vectors_int(res.total.counts, sums_samps[i][j].counts);
             
             if(p.r12_v1a){
-                sum_vectors_double(p, res.total.r12_v1a, sums_samps[i][j].r12_v1a);
+                sum_vectors_double(res.total.r12_v1a, sums_samps[i][j].r12_v1a);
             }
             
             
             if(p.r12_v1b){
-                sum_vectors_double(p, res.total.r12_v1b, sums_samps[i][j].r12_v1b);
+                sum_vectors_double(res.total.r12_v1b, sums_samps[i][j].r12_v1b);
             }
             
             
             if(p.r12_v2a){
-                sum_vectors_double(p, res.total.r12_v2a, sums_samps[i][j].r12_v2a);
+                sum_vectors_double(res.total.r12_v2a, sums_samps[i][j].r12_v2a);
             }
 
             
             if(p.r12_v2b){
-                sum_vectors_double(p, res.total.r12_v2b, sums_samps[i][j].r12_v2b);
+                sum_vectors_double(res.total.r12_v2b, sums_samps[i][j].r12_v2b);
             }
             
             
             if(p.v1a_v2a){
-                sum_vectors_double(p, res.total.v1a_v2a, sums_samps[i][j].v1a_v2a);
+                sum_vectors_double(res.total.v1a_v2a, sums_samps[i][j].v1a_v2a);
             }
             
             
             if(p.v1b_v2b){
-                sum_vectors_double(p, res.total.v1b_v2b, sums_samps[i][j].v1b_v2b);
+                sum_vectors_double(res.total.v1b_v2b, sums_samps[i][j].v1b_v2b);
             }
             
 
             if(p.v1a_v2b){
-                sum_vectors_double(p, res.total.v1a_v2b, sums_samps[i][j].v1a_v2b);
+                sum_vectors_double(res.total.v1a_v2b, sums_samps[i][j].v1a_v2b);
             }
 
             
             if(p.v1b_v2a){
-                sum_vectors_double(p, res.total.v1b_v2a, sums_samps[i][j].v1b_v2a);
+                sum_vectors_double(res.total.v1b_v2a, sums_samps[i][j].v1b_v2a);
             }
             
         }
@@ -334,46 +334,46 @@ void correlation::jk_sampling(const parameters p){
             for(int j=0; j < sums_samps[i].size(); j++){
                 if(i==s || j==s){
                     
-                    subtract_vectors_int(p, res.jack_knife[s].counts, sums_samps[i][j].counts);
+                    subtract_vectors_int(res.jack_knife[s].counts, sums_samps[i][j].counts);
                     
                     
                     if(p.r12_v1a){
-                        subtract_vectors_double(p, res.jack_knife[s].r12_v1a, sums_samps[i][j].r12_v1a);
+                        subtract_vectors_double(res.jack_knife[s].r12_v1a, sums_samps[i][j].r12_v1a);
                     }
                     
                     
                     if(p.r12_v1b){
-                        subtract_vectors_double(p, res.jack_knife[s].r12_v1b, sums_samps[i][j].r12_v1b);
+                        subtract_vectors_double(res.jack_knife[s].r12_v1b, sums_samps[i][j].r12_v1b);
                     }
                     
                     
                     if(p.r12_v2a){
-                        subtract_vectors_double(p, res.jack_knife[s].r12_v2a, sums_samps[i][j].r12_v2a);
+                        subtract_vectors_double(res.jack_knife[s].r12_v2a, sums_samps[i][j].r12_v2a);
                     }
 
                     
                     if(p.r12_v2b){
-                        subtract_vectors_double(p, res.jack_knife[s].r12_v2b, sums_samps[i][j].r12_v2b);
+                        subtract_vectors_double(res.jack_knife[s].r12_v2b, sums_samps[i][j].r12_v2b);
                     }
                     
                     
                     if(p.v1a_v2a){
-                        subtract_vectors_double(p, res.jack_knife[s].v1a_v2a, sums_samps[i][j].v1a_v2a);
+                        subtract_vectors_double(res.jack_knife[s].v1a_v2a, sums_samps[i][j].v1a_v2a);
                     }
                     
                     
                     if(p.v1b_v2b){
-                        subtract_vectors_double(p, res.jack_knife[s].v1b_v2b, sums_samps[i][j].v1b_v2b);
+                        subtract_vectors_double(res.jack_knife[s].v1b_v2b, sums_samps[i][j].v1b_v2b);
                     }
                     
 
                     if(p.v1a_v2b){
-                        subtract_vectors_double(p, res.jack_knife[s].v1a_v2b, sums_samps[i][j].v1a_v2b);
+                        subtract_vectors_double(res.jack_knife[s].v1a_v2b, sums_samps[i][j].v1a_v2b);
                     }
 
                     
                     if(p.v1b_v2a){
-                        subtract_vectors_double(p, res.jack_knife[s].v1b_v2a, sums_samps[i][j].v1b_v2a);
+                        subtract_vectors_double(res.jack_knife[s].v1b_v2a, sums_samps[i][j].v1b_v2a);
                     }
                     
                 }
@@ -393,15 +393,15 @@ void correlation::normalize_total(const parameters p){
     //normalize total
     std::vector <double> norm(res.total.counts.begin(), res.total.counts.end());
 
-    divide_vectors_double(p, res.total.r12_v1a, norm);
-    divide_vectors_double(p, res.total.r12_v1b, norm);
-    divide_vectors_double(p, res.total.r12_v2a, norm);
-    divide_vectors_double(p, res.total.r12_v2b, norm);
+    divide_vectors_double(res.total.r12_v1a, norm);
+    divide_vectors_double(res.total.r12_v1b, norm);
+    divide_vectors_double(res.total.r12_v2a, norm);
+    divide_vectors_double(res.total.r12_v2b, norm);
     
-    divide_vectors_double(p, res.total.v1a_v2a, norm);
-    divide_vectors_double(p, res.total.v1b_v2b, norm);
-    divide_vectors_double(p, res.total.v1a_v2b, norm);
-    divide_vectors_double(p, res.total.v1b_v2a, norm);
+    divide_vectors_double(res.total.v1a_v2a, norm);
+    divide_vectors_double(res.total.v1b_v2b, norm);
+    divide_vectors_double(res.total.v1a_v2b, norm);
+    divide_vectors_double(res.total.v1b_v2a, norm);
     
 }
 
@@ -419,15 +419,15 @@ void correlation::normalize_jk(const parameters p){
 
         std::vector <double> norm(res.jack_knife[s].counts.begin(), res.jack_knife[s].counts.end());
 
-        divide_vectors_double(p, res.jack_knife[s].r12_v1a, norm);
-        divide_vectors_double(p, res.jack_knife[s].r12_v1b, norm);
-        divide_vectors_double(p, res.jack_knife[s].r12_v2a, norm);
-        divide_vectors_double(p, res.jack_knife[s].r12_v2b, norm);
+        divide_vectors_double(res.jack_knife[s].r12_v1a, norm);
+        divide_vectors_double(res.jack_knife[s].r12_v1b, norm);
+        divide_vectors_double(res.jack_knife[s].r12_v2a, norm);
+        divide_vectors_double(res.jack_knife[s].r12_v2b, norm);
         
-        divide_vectors_double(p, res.jack_knife[s].v1a_v2a, norm);
-        divide_vectors_double(p, res.jack_knife[s].v1b_v2b, norm);
-        divide_vectors_double(p, res.jack_knife[s].v1a_v2b, norm);
-        divide_vectors_double(p, res.jack_knife[s].v1b_v2a, norm);
+        divide_vectors_double(res.jack_knife[s].v1a_v2a, norm);
+        divide_vectors_double(res.jack_knife[s].v1b_v2b, norm);
+        divide_vectors_double(res.jack_knife[s].v1a_v2b, norm);
+        divide_vectors_double(res.jack_knife[s].v1b_v2a, norm);
     }
         
 }

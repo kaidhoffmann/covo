@@ -11,8 +11,6 @@
 #include <cmath>
 
 
-//commit massage: "move sum_vectors_int, sum_vectors_double, subtract_vectors_int, subtract_vectors_double, divide_vectors_double" from correlation.h to toolbox.h
-
 
 // absolute value of vector
 double vabs(const std::vector<double> vec);
