@@ -39,21 +39,10 @@ class correlation{
         const std::vector < catalogue::object > & obj_2);
 
     
-    double distance(const std::vector <double> & pos_1,  const std::vector <double> & pos_2);
-
     double min_samp_dist(
         const std::vector < std::vector < double > > & edge_1,
         const std::vector < std::vector < double > > & edge_2);
     
-    void sum_vectors_int(const parameters p, std::vector < int > & total_sum, std::vector < int > & to_add);
-    
-    void sum_vectors_double(const parameters p, std::vector < double > & total_sum, std::vector < double > & to_add);
-
-    void subtract_vectors_int(const parameters p, std::vector < int > & total_sum, std::vector < int > & to_substract);
-    
-    void subtract_vectors_double(const parameters p, std::vector < double > & total_sum, std::vector < double > & to_substract);
-
-    void divide_vectors_double(const parameters p, std::vector < double > & numerator, std::vector < double > & denominator);
     
     void sums_for_sample_combinations(const parameters p, catalogue & cat_1, catalogue & cat_2);
     

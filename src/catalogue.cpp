@@ -13,6 +13,7 @@
 #include <numeric>
 #include "parameters.h"
 #include "catalogue.h"
+#include "toolbox.h"
 
 
 
@@ -268,12 +269,66 @@ void catalogue::make_samples_cart(std::vector < int > & numb_jk){
 // - samples build using healpix mesh
 // - should be used for data in sphere.
 // ==========================================================
-void catalogue::make_samples_healpix(std::vector < int > & nside){
+void catalogue::make_samples_healpix(int nside){
     
+        //total number of samples
+        //->nside to pix
+        int Nsamp_tot = 12*pow(nside,2);
     
+        //initialize samples
+        for(int i = 0; i < Nsamp_tot; i++){
+            sample s;
+            samp.push_back(s);
+        }
+    
+        //get angular limits of input cataloue
+
+        //delete samples which fall out of angular range
+        //angtopix
+        
+        //generate points along angular borders, in for loops:
+        //(phi_max+dang, loop over theta) 
+        //(phi_min-dang, loop over theta) 
+        //(theta_max+dang, loop over phi) 
+        //(theta_min-dang, loop over phi)
+        
+        
+        
+        //add objects to samples
+        for(int i=0; i<input.obj.size();i++){
+            
+            //std::vector < double > pos_cart = rand_vec_sphere(2);
+            
+            //std::vector < double > pos_ang = cart_to_sphere(pos_cart);
+            
+            //std::vector < double > pos_cart_test = sphere_to_cart(pos_ang);
+            
+            //std::cout<<distance(pos_ang, pos_cart)<<std::endl;
+            
+            //double r = 
+            
+     //           type r = vabs(pos_cart);
+    
+   // pos_sphere.push_back( r );
+   // pos_sphere.push_back( atan2(pos_cart[1],  pos_cart[0]) );
+   // pos_sphere.push_back( acos(pos_cart[2] / r) );
+            
+            
+            
+            //input.obj[i].pos[0]<<"\t"<<input.obj[i].pos[1]<<"\t"<<input.obj[i].pos[2]<<"\t"
+            //std::cout<<pos_ang[0]<<"\t"<<pos_ang[1]<<"\t"<<pos_ang[2]<<"\t"<<std::endl;
+            /*std::cout
+            <<pos_cart[0]<<"\t"<<pos_cart[1]<<"\t"<<pos_cart[2]<<"\t"
+            <<pos_cart_test[0]<<"\t"<<pos_cart_test[1]<<"\t"<<pos_cart_test[2]<<"\t"<<std::endl;*/
+            
+            //std::cout<<vabs(input.obj[i].pos)<<"\t"<<vabs(pos_cart)<<std::endl;
+            
+            
+            
+            //int ID = pos_to_ID_cart(numb_jk, input.obj[i].pos, pos_limits, Lcell);
+            //samp[ID].obj.push_back(input.obj[i]);
+        }
 }
-
-
 
 
 

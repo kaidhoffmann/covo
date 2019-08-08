@@ -19,9 +19,7 @@ class catalogue{
         const std::vector < std::vector < double > > & pos_limits,
         const std::vector < double > & Lcell);
     
-   
-    
-    std::vector<double>rand_vec_sphere(double radius);
+    std::vector<double> rand_vec_sphere(double radius);
     std::vector<double> rand_vec_box(std::vector<double> x_lim, std::vector<double> y_lim, std::vector<double> z_lim);
 
     public:
@@ -53,7 +51,7 @@ class catalogue{
    
     void make_samples_cart(std::vector < int > & numb_jk);
 
-    void make_samples_healpix(std::vector < int > & nside);
+    void make_samples_healpix(int nside);
     
     void delete_input();
 

@@ -100,6 +100,9 @@ int main(int argc, char **argv){
     cat_1.make_samples_cart(p.numb_jk);
     cat_2.make_samples_cart(p.numb_jk);
     
+    //healpix
+    //cat_1.make_samples_healpix(4);
+    
     
     //delete original input catalogue to free memory
     cat_1.delete_input();

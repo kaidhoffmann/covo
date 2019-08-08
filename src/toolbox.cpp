@@ -5,8 +5,10 @@
 
 #include <vector>
 #include <cmath>
+#include "parameters.h"
 #include "toolbox.h"
-
+//#include <functional>   // std::divides
+#include <algorithm>
 
 // ==========================================================
 // absolute value of vector
@@ -21,6 +23,36 @@ double vabs(const std::vector<double> vec) {
     
     return sqrt(abs_val);
 }
+
+// ==========================================================
+// distance of two Nd positions
+// ==========================================================
+double distance(const std::vector <double> & pos_1,  const std::vector <double> & pos_2){
+    
+    double dist=0;
+    
+    for(int i=0; i<pos_1.size();i++){
+        dist += pow(pos_2[i] - pos_1[i],2);
+    }
+    
+    return sqrt(dist);
+};
+
+
+// ==========================================================
+// distance of two Nd positions
+// ==========================================================
+double distance_new(const std::vector <double> & pos_1,  const std::vector <double> & pos_2){
+    
+    double dist=0;
+    
+    for(int i=0; i<pos_1.size();i++){
+        dist += pow(pos_2[i] - pos_1[i],2);
+    }
+    
+    return sqrt(dist);
+};
+
 
 // ==========================================================
 // convert cartesian to spehrical coordinates
@@ -53,4 +85,75 @@ std::vector<double> sphere_to_cart(const std::vector<double> pos_sphere) {
     
     return pos_cart;
 }
+
+
+
+
+// ==========================================================
+// add integer vector "to_add" to integer vector "total_sum"
+// ==========================================================
+void sum_vectors_int(const parameters p, std::vector < int > & total_sum, std::vector < int > & to_add){
+    
+    std::transform (
+            total_sum.begin(), total_sum.end(),
+            to_add.begin(),total_sum.begin(),
+            std::plus<int>());
+        
+}
+
+
+
+// ==========================================================
+// add double vector "to_add" to double vector "total_sum"
+// ==========================================================
+void sum_vectors_double(const parameters p, std::vector < double > & total_sum, std::vector < double > & to_add){
+    
+    std::transform (
+            total_sum.begin(), total_sum.end(),
+            to_add.begin(),total_sum.begin(),
+            std::plus<double>());
+        
+}
+
+
+
+// ==========================================================
+// subtract integer vector "to_subtract" from integer vector "total_sum" 
+// ==========================================================
+void subtract_vectors_int(const parameters p, std::vector < int > & total_sum, std::vector < int > & to_subtract){
+    
+    std::transform (
+            total_sum.begin(), total_sum.end(),
+            to_subtract.begin(),total_sum.begin(),
+            std::minus<int>());
+        
+}
+
+
+
+// ==========================================================
+// subtract double vector "to_subtract" from double vector "total_sum" 
+// ==========================================================
+void subtract_vectors_double(const parameters p, std::vector < double > & total_sum, std::vector < double > & to_subtract){
+    
+    std::transform (
+            total_sum.begin(), total_sum.end(),
+            to_subtract.begin(),total_sum.begin(),
+            std::minus<double>());
+}
+
+
+
+// ==========================================================
+// devide elements in double vectors "numerator" and "denominator"
+// ==========================================================
+void divide_vectors_double(const parameters p, std::vector < double > & numerator, std::vector < double > & denominator){
+    std::transform (
+            numerator.begin(), numerator.end(),
+            denominator.begin(),numerator.begin(),
+            std::divides<double>());
+}
+
+
+
 
