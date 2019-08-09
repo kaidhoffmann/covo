@@ -9,38 +9,107 @@
 
 #include <vector>
 #include <cmath>
+#include <algorithm>
 
 
+// ==========================================================
+// subtract vector "to_subtract" from vector "total_sum" 
+// ==========================================================
+template <typename T> inline void subtract_vectors(std::vector < T > & total_sum, std::vector < T > & to_subtract){
+    std::transform (
+        total_sum.begin(), total_sum.end(),
+        to_subtract.begin(),total_sum.begin(),
+        std::minus<T>());
+}
 
+
+// ==========================================================
+//add vector "to_add" to vector "total_sum"
+// ==========================================================
+template <typename T> inline void sum_vectors(std::vector < T > & total_sum, std::vector < T > & to_add){
+    
+    std::transform (
+            total_sum.begin(), total_sum.end(),
+            to_add.begin(),total_sum.begin(),
+            std::plus<T>());
+        
+}
+
+
+// ==========================================================
+// devide elements in vectors "numerator" and "denominator"
+// ==========================================================
+template <typename T> inline void divide_vectors(std::vector < T > & numerator, std::vector < T > & denominator){
+    std::transform (
+            numerator.begin(), numerator.end(),
+            denominator.begin(),numerator.begin(),
+            std::divides<T>());
+}
+
+
+// ==========================================================
 // absolute value of vector
-double vabs(const std::vector<double> vec);
+// ==========================================================
+template <typename T> inline double vabs(const std::vector<T> vec) {
 
-//add integer vector "to_add" to integer vector "total_sum"
-void sum_vectors_int(const parameters p, std::vector < int > & total_sum, std::vector < int > & to_add);
+    T abs_val = 0;
 
-// add double vector "to_add" to double vector "total_sum"
-void sum_vectors_double(const parameters p, std::vector < double > & total_sum, std::vector < double > & to_add);
-
-// subtract integer vector "to_subtract" from integer vector "total_sum"
-void subtract_vectors_int(const parameters p, std::vector < int > & total_sum, std::vector < int > & to_subtract);
-
-// subtract double vector "to_subtract" from double vector "total_sum" 
-void subtract_vectors_double(const parameters p, std::vector < double > & total_sum, std::vector < double > & to_subtract);
-
-// devide elements in double vectors "numerator" and "denominator"
-void divide_vectors_double(const parameters p, std::vector < double > & numerator, std::vector < double > & denominator);
+    for(int i=0; i<vec.size(); i++){
+        abs_val += pow(vec[i],2);
+    }
+    
+    return sqrt(abs_val);
+}
 
 
-// distance of two Nd positions
-double distance(const std::vector <double> & pos_1,  const std::vector <double> & pos_2);
-double distance_new(const std::vector <double> & pos_1,  const std::vector <double> & pos_2);
+// ==========================================================
+// distance between two Nd positions
+// ==========================================================
+template <typename T> inline double distance(const std::vector <T> & pos_1,  const std::vector <T> & pos_2){
+    
+    T dist=0;
+    
+    for(int i=0; i<pos_1.size();i++){
+        dist += pow(pos_2[i] - pos_1[i],2);
+    }
+    
+    return sqrt(dist);
+};
 
-// convert cartesian to spehrical coordinates
-std::vector<double> cart_to_sphere(const std::vector<double> pos_cart);
 
 
+// ==========================================================
 // convert spehrical coordinates to cartesian
-std::vector<double> sphere_to_cart(const std::vector<double> pos_sphere);
+// ==========================================================
+template <typename T> inline std::vector<T> sphere_to_cart(const std::vector<T> pos_sphere) {
+
+    std::vector<T> pos_cart;
+    
+    pos_cart.push_back( pos_sphere[0] * sin(pos_sphere[2]) * cos(pos_sphere[1]) );
+    pos_cart.push_back( pos_sphere[0] * sin(pos_sphere[2]) * sin(pos_sphere[1]) );
+    pos_cart.push_back( pos_sphere[0] * cos(pos_sphere[2]) );
+    
+    return pos_cart;
+}
+
+
+
+// ==========================================================
+// convert cartesian to spehrical coordinates
+// ==========================================================
+template <typename T> inline std::vector<T> cart_to_sphere(const std::vector<T> pos_cart) {
+
+    std::vector<T> pos_sphere;
+    
+    T r = vabs(pos_cart);
+    
+    pos_sphere.push_back( r );
+    pos_sphere.push_back( atan2(pos_cart[1],  pos_cart[0]) );
+    pos_sphere.push_back( acos(pos_cart[2] / r) );
+    
+    return pos_sphere;
+}
+
 
 
 
