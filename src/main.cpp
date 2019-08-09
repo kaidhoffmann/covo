@@ -105,8 +105,10 @@ int main(int argc, char **argv){
     
     
     //delete original input catalogue to free memory
-    cat_1.delete_input();
-    cat_2.delete_input();
+//#TODO: solve corrupted size vs. prev_size
+//#Aborted (core dumped)
+    //cat_1.delete_input();
+    //cat_2.delete_input();
     
     
     

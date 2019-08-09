@@ -297,13 +297,13 @@ void catalogue::make_samples_healpix(int nside){
         //add objects to samples
         for(int i=0; i<input.obj.size();i++){
             
-            //std::vector < double > pos_cart = rand_vec_sphere(2);
+            std::vector < double > pos_cart = rand_vec_sphere(2);
             
-            //std::vector < double > pos_ang = cart_to_sphere(pos_cart);
+            std::vector < double > pos_ang = cart_to_sphere(pos_cart);
             
-            //std::vector < double > pos_cart_test = sphere_to_cart(pos_ang);
+            std::vector < double > pos_cart_test = sphere_to_cart(pos_ang);
             
-            //std::cout<<distance(pos_ang, pos_cart)<<std::endl;
+            std::cout << distance(pos_ang, pos_cart)  <<std::endl;
             
             //double r = 
             

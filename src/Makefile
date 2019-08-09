@@ -2,7 +2,7 @@ LDFLAGS = -std=c++11 -O3
 CC      = g++
 
 
-OBJ = main.o parameters.o directory.o toolbox.o healpix.o catalogue.o  correlation.o
+OBJ = main.o parameters.o directory.o healpix.o catalogue.o  correlation.o
 #------------------------------------------------------
 
 covo: $(OBJ)
@@ -22,10 +22,6 @@ catalogue.o: catalogue.cpp
 
 correlation.o: correlation.cpp
 	${CC} -c correlation.cpp ${LDFLAGS}
-
-
-toolbox.o: toolbox.cpp
-	${CC} -c toolbox.cpp ${LDFLAGS}
 
 healpix.o: healpix.cpp
 	${CC} -c healpix.cpp ${LDFLAGS}
