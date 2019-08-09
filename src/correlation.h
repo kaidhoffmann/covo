@@ -13,7 +13,7 @@
 class correlation{
     
     struct vars{
-        std::vector < int > counts;
+        std::vector < unsigned long > counts;
         
         std::vector < double > r12_v1a;
         std::vector < double > r12_v1b;
