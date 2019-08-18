@@ -287,6 +287,14 @@ void catalogue::make_samples_healpix(const parameters p){
 
     phi_lim.push_back(0*M_PI/180);
     phi_lim.push_back(90*M_PI/180);
+    
+    //todo and new parameters:
+    // -option for healpix sampling: JK_type = healpix, box
+    // add parameters: r_lim, theta_lim, phi_lim
+    
+    
+    
+    
     //-----------------------------------------------
     
 

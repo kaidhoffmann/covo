@@ -25,6 +25,8 @@ class parameters{
     
     std::vector <int> cols_pos, cols_vec_a, cols_vec_b;
     
+    std::string type_subsample;
+    
     std::vector <int> numb_jk;
     
     void read(std::string fname);

@@ -45,6 +45,11 @@ v1b_v2a = true
 # set zero for silence
 verbose = 2
 
+# method for building subsamples
+# ("cartesian" for rectangular subvolumes, "healpix" for healpix samples on sphere with radial bins)
+#type_subsample = cartesian
+type_subsample = healpix
+
 
 # jack-knife samples per axis
 numb_jk  = 4,4,4

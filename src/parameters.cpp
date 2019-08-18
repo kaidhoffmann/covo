@@ -46,6 +46,7 @@ void parameters::read(std::string fname){
     cols_vec_a = extract_numbers_int( get_param(fname, "cols_vec_a") );
     cols_vec_b = extract_numbers_int( get_param(fname, "cols_vec_b") );
     
+    type_subsample = get_param(fname, "type_subsample");
     
     //number of jk samples per axis
     numb_jk = extract_numbers_int( get_param(fname, "numb_jk") );
@@ -80,7 +81,7 @@ void parameters::read(std::string fname){
   
     make_rand = (get_param(fname, "make_rand") == "true");
     rand_seed = std::stod( get_param(fname, "rand_seed") );
-    fname_rand = get_param(fname, "fname_rand");    
+    fname_rand = get_param(fname, "fname_rand");
 };
 
 
@@ -119,6 +120,14 @@ bool parameters::check(){
         eishockey = false;        
     }
     
+    if(type_subsample !="cartesian" && type_subsample !="healpix"){
+        std::cerr<<"# ##### ERROR: type_subsample must be cartesian or healpix" << std::endl;
+        eishockey = false;        
+    }
+    
+        std::cout<<std::endl;
+
+    
     return eishockey;
 };
 
@@ -151,7 +160,13 @@ void parameters::print(){
     
     int Njk=1;
     for(int i = 0; i < numb_jk.size(); i++){ Njk *= numb_jk[i]; }
-
+    
+    
+    std::cout << "# type_subsample: ";
+    std::cout << type_subsample << std::endl;
+    std::cout<<std::endl;
+    
+    
     std::cout << "# JK samples per axis: ";
     for(int i = 0; i < numb_jk.size(); i++){ std::cout<<numb_jk[i]<<" "; }
     std::cout << " => " << Njk << " samples in total" << std::endl;
@@ -193,10 +208,10 @@ void parameters::print(){
     std::cout<<std::endl;
     
     
-    
     std::cout<<"# make_rand = "<<make_rand<<std::endl;
     std::cout<<"# rand_seed = "<<rand_seed<<std::endl;
     std::cout<<"# fname_rand = "<<fname_rand<<std::endl;
+    
     
     std::cout<<"# numb_rand = "<<numb_rand<<std::endl;
     
