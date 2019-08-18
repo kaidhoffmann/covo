@@ -1,7 +1,7 @@
 /*
  *  This file was copied and modified from healpix_base.h in Healpix_cxx.
  *  Copyright (C) 2003, 2004, 2005, 2006 Max-Planck-Society
- *  (see https://healpix.jpl.nasa.gov/html/Healpix_cxx/healpix__base2_8cc-source.html)
+ *  (see https://healpix.jpl.nasa.gov/html/Healpix_cxx/files.html)
  *  the original author is Martin Reinecke
 */
 
@@ -10,6 +10,7 @@
 #define HEALPIX_BASE_H
 
 #include <cmath>
+#include <vector>
 
 
 class healpix{
@@ -33,31 +34,46 @@ class healpix{
     const double degr2rad=pi/180.0;
     const double rad2degr=180.0/pi;
     
-    static short utab[0x100];
+    static short ctab[0x100], utab[0x100];
     
-    int xyf2nest (int ix, int iy, int face_num, int order) const;
+    static const int jrll[];
+    static const int jpll[];
+
     
+    // The order of the map; -1 for nonhierarchical map.
+    int order_;
+    
+    // The N_side parameter of the map; 0 if not allocated.
+    int nside_;
+    int npface_, ncap_, npix_;
+    double fact1_, fact2_;
+
+    //Adjusts the object to nside
+    void SetNside (int nside);
+
     class Tablefiller{
       public:
         Tablefiller();
       };
+      
+      
     static Tablefiller Filler;
     
-    /*! Returns the remainder of the division v1/v2.
-    The result is non-negative.
-    v1 can be positive or negative; v2 must be positive. */
-    inline double fmodulo (double v1, double v2);
+    //Returns the remainder of the division v1/v2.
+    //The result is non-negative.
+    //v1 can be positive or negative; v2 must be positive.
+    inline double fmodulo (double v1, double v2) const;
     
     
-    /*! Returns the remainder of the division v1/v2.
-    The result is non-negative.
-    v1 can be positive or negative; \a v2 must be positive. */
+    //Returns the remainder of the division v1/v2.
+    //The result is non-negative.
+    //v1 can be positive or negative; \a v2 must be positive.
     template<typename I> inline I imodulo (I v1, I v2)
     { I v=v1%v2; return (v>=0) ? v : v+v2; }
    
    
-    /*! Returns the largest integer \a n that fulfills \a 2^n<=arg. */
-    template<typename I> inline int ilog2 (I arg)
+    //Returns the largest integer \a n that fulfills \a 2^n<=arg.
+    template<typename I> inline int ilog2 (I arg) const
     {
         #ifdef __GNUC__
         if (arg==0) return 0;
@@ -74,18 +90,52 @@ class healpix{
         if (arg > 0x000F) { res|=4; arg>>=4; }
         if (arg > 0x0003) { res|=2; arg>>=2; }
         if (arg > 0x0001) { res|=1; }
-    return res;
+    
+        return res;
     }
    
-   int xyf2nest(int ix, int iy, int face_num);
    
-public:
+    struct cell {
+        long ID;
+        bool masked;
+    };
     
-    int nside2order (int nside);
+    
+    
+    /*
+    
+    //! Returns the angular coordinates of the center of the pixel with number pix.
+     pointing pix2ang (I pix) const
+       {
+       double z, phi, sth;
+       bool have_sth;
+       pix2loc (pix,z,phi,sth,have_sth);
+       return have_sth ? pointing(atan2(sth,z),phi) : pointing(acos(z),phi);
+    }
+    
+    */
 
-    int ang2pix_z_phi_nest (double z, double phi, int nside);
 
-    int ang2pix_nest (double theta, double phi, int nside);
+    public:
+    
+    
+    std::vector < cell > cells;
+    
+    void make_mask(int nside, const std::vector <double> theta_lim, const std::vector <double> phi_lim);
+    
+    int nside2order (int nside) const;
+        
+    // Returns the number of the pixel which contains the angular coordinates (using nested scheme)
+    int ang2pix_nest (double theta, double phi) const;
+    int ang2pix_z_phi_nest (double z, double phi) const;
+        
+    // Returns the angular coordinates of the center of the pixel with number pix
+    void pix2ang_nest (int pix, double &theta, double &phi);
+    void pix2ang_z_phi_nest (int pix, double &z, double &phi);
+    
+    int xyf2nest (int ix, int iy, int face_num) const;
+    void nest2xyf(int pix, int &ix, int &iy, int &face_num) const;
+
 
 };
 

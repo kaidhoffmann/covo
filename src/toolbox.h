@@ -85,9 +85,9 @@ template <typename T> inline std::vector<T> sphere_to_cart(const std::vector<T> 
 
     std::vector<T> pos_cart;
     
-    pos_cart.push_back( pos_sphere[0] * sin(pos_sphere[2]) * cos(pos_sphere[1]) );
-    pos_cart.push_back( pos_sphere[0] * sin(pos_sphere[2]) * sin(pos_sphere[1]) );
-    pos_cart.push_back( pos_sphere[0] * cos(pos_sphere[2]) );
+    pos_cart.push_back( pos_sphere[0] * sin(pos_sphere[1]) * cos(pos_sphere[2]) );
+    pos_cart.push_back( pos_sphere[0] * sin(pos_sphere[1]) * sin(pos_sphere[2]) );
+    pos_cart.push_back( pos_sphere[0] * cos(pos_sphere[1]) );
     
     return pos_cart;
 }
@@ -104,8 +104,8 @@ template <typename T> inline std::vector<T> cart_to_sphere(const std::vector<T> 
     T r = vabs(pos_cart);
     
     pos_sphere.push_back( r );
-    pos_sphere.push_back( atan2(pos_cart[1],  pos_cart[0]) );
     pos_sphere.push_back( acos(pos_cart[2] / r) );
+    pos_sphere.push_back( atan2(pos_cart[1],  pos_cart[0]) );
     
     return pos_sphere;
 }

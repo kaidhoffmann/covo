@@ -14,6 +14,7 @@
 #include "parameters.h"
 #include "catalogue.h"
 #include "toolbox.h"
+#include "healpix.h"
 
 
 
@@ -269,65 +270,113 @@ void catalogue::make_samples_cart(std::vector < int > & numb_jk){
 // - samples build using healpix mesh
 // - should be used for data in sphere.
 // ==========================================================
-void catalogue::make_samples_healpix(int nside){
+void catalogue::make_samples_healpix(const parameters p){
     
-        //total number of samples
-        //->nside to pix
-        int Nsamp_tot = 12*pow(nside,2);
+    //-----------------------------------------------
+    int nside = 8;
+    int Nbin_rad = 2;
     
-        //initialize samples
-        for(int i = 0; i < Nsamp_tot; i++){
-            sample s;
-            samp.push_back(s);
-        }
+    //TODO: get this from param file
+    std::vector <double> r_lim,theta_lim, phi_lim;
     
-        //get angular limits of input cataloue
+    r_lim.push_back(200000);
+    r_lim.push_back(300000);
 
-        //delete samples which fall out of angular range
-        //angtopix
-        
-        //generate points along angular borders, in for loops:
-        //(phi_max+dang, loop over theta) 
-        //(phi_min-dang, loop over theta) 
-        //(theta_max+dang, loop over phi) 
-        //(theta_min-dang, loop over phi)
-        
-        
-        
-        //add objects to samples
-        for(int i=0; i<input.obj.size();i++){
-            
-            std::vector < double > pos_cart = rand_vec_sphere(2);
-            
-            std::vector < double > pos_ang = cart_to_sphere(pos_cart);
-            
-            std::vector < double > pos_cart_test = sphere_to_cart(pos_ang);
-            
-            std::cout << distance(pos_ang, pos_cart)  <<std::endl;
-            
-            //double r = 
-            
-     //           type r = vabs(pos_cart);
+    theta_lim.push_back(0*M_PI/180);
+    theta_lim.push_back(90*M_PI/180);
+
+    phi_lim.push_back(0*M_PI/180);
+    phi_lim.push_back(90*M_PI/180);
+    //-----------------------------------------------
     
-   // pos_sphere.push_back( r );
-   // pos_sphere.push_back( atan2(pos_cart[1],  pos_cart[0]) );
-   // pos_sphere.push_back( acos(pos_cart[2] / r) );
-            
-            
-            
-            //input.obj[i].pos[0]<<"\t"<<input.obj[i].pos[1]<<"\t"<<input.obj[i].pos[2]<<"\t"
-            //std::cout<<pos_ang[0]<<"\t"<<pos_ang[1]<<"\t"<<pos_ang[2]<<"\t"<<std::endl;
-            /*std::cout
-            <<pos_cart[0]<<"\t"<<pos_cart[1]<<"\t"<<pos_cart[2]<<"\t"
-            <<pos_cart_test[0]<<"\t"<<pos_cart_test[1]<<"\t"<<pos_cart_test[2]<<"\t"<<std::endl;*/
-            
-            //std::cout<<vabs(input.obj[i].pos)<<"\t"<<vabs(pos_cart)<<std::endl;
-            
-            
-            
-            //int ID = pos_to_ID_cart(numb_jk, input.obj[i].pos, pos_limits, Lcell);
-            //samp[ID].obj.push_back(input.obj[i]);
+
+    //make healpix mask
+    healpix hp;
+    hp.make_mask(nside, theta_lim, phi_lim);
+    
+    //radial bin width//
+    double dr = (r_lim[1] - r_lim[0]) / double(Nbin_rad);
+
+    //initialize samples, add radial bin and healpix ID    
+    for(int i=0; i<hp.cells.size(); i++){//loop over healpix cells
+        if(!hp.cells[i].masked){
+            for(int j=0; j<Nbin_rad; j++){//loop over radial bins
+                sample s;
+                s.hp_ID = hp.cells[i].ID;
+                s.bin_rad = j;
+                samp.push_back(s);
+            }
         }
+    }
+
+    
+    
+    //add objects to samples
+    for(int i=0; i<input.obj.size();i++){
+        
+        std::vector < double > pos_sphere = cart_to_sphere(input.obj[i].pos);
+        
+        int bin_rad = int((pos_sphere[0] - r_lim[0]) / dr );
+    
+        long hp_ID = hp.ang2pix_nest(pos_sphere[1], pos_sphere[2]);
+         
+        for(int samp_ID=0; samp_ID<samp.size(); samp_ID++){
+            
+            if(samp[samp_ID].bin_rad == bin_rad && samp[samp_ID].hp_ID==hp_ID){
+                samp[samp_ID].obj.push_back(input.obj[i]);
+            }
+        }
+    }
+    
+    
+
+    //sample edges: min, max of xyz corrdinates (like drawing a box, which encloses the sample)
+    for(int samp_ID=0; samp_ID<samp.size(); samp_ID++){
+        
+        if(samp[samp_ID].obj.size()>0){//loop over samples
+        
+            std::vector< std::vector <double> > pos_limits;
+        
+            //initilize
+            for(int dim=0; dim<samp[samp_ID].obj[0].pos.size(); dim++){//loop over dimensions
+                double pos_ini = samp[samp_ID].obj[0].pos[dim];
+                pos_limits.push_back({pos_ini, pos_ini});
+            }
+        
+            //find min and max position in each dimension
+            for(int obj_ID=0; obj_ID < samp[samp_ID].obj.size(); obj_ID++){//loop over objects in sample
+                            
+                for(int dim=0; dim < pos_limits.size(); dim++){//loop over dimensions
+                    
+                    //min
+                    if(samp[samp_ID].obj[obj_ID].pos[dim] < pos_limits[dim][0]){
+                        pos_limits[dim][0] = samp[samp_ID].obj[obj_ID].pos[dim];
+                    }
+
+                    //max
+                    if(samp[samp_ID].obj[obj_ID].pos[dim] > pos_limits[dim][1]){
+                        pos_limits[dim][1] = samp[samp_ID].obj[obj_ID].pos[dim];
+                    }
+                }
+            }
+        
+            //loop over edges
+            for(int ie = 0; ie < 2; ie++){
+                for(int je = 0; je < 2; je++){
+                    for(int ke = 0; ke < 2; ke++){
+
+                        std::vector <double> coordinates =
+                        {pos_limits[0][ie], pos_limits[1][je], pos_limits[2][ke]};
+                        
+                        samp[samp_ID].edge.push_back(coordinates);
+
+                    }
+                }
+            }
+            
+        }
+    }
+    
 }
 
 

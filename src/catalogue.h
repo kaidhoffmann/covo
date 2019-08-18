@@ -31,6 +31,8 @@ class catalogue{
     };
         
     struct sample {
+        long hp_ID;
+        int bin_rad;
         std::vector < object > obj;
         std::vector < double > cent;
         std::vector < std::vector < double > > edge;
@@ -51,7 +53,7 @@ class catalogue{
    
     void make_samples_cart(std::vector < int > & numb_jk);
 
-    void make_samples_healpix(int nside);
+    void make_samples_healpix(const parameters p);
     
     void delete_input();
 

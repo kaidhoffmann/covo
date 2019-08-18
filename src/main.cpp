@@ -17,7 +17,7 @@
 
 int main(int argc, char **argv){
     
-    
+
     //===============================
     // read parameters
     //===============================
@@ -97,19 +97,15 @@ int main(int argc, char **argv){
     cat_2.normalize_vectors();
     
     //make jack-knife samples
-    cat_1.make_samples_cart(p.numb_jk);
-    cat_2.make_samples_cart(p.numb_jk);
+    //cat_1.make_samples_cart(p.numb_jk);
+    //cat_2.make_samples_cart(p.numb_jk);
     
-    //healpix
-    //cat_1.make_samples_healpix(4);
-    
+    cat_1.make_samples_healpix(p);
+    cat_2.make_samples_healpix(p);
     
     //delete original input catalogue to free memory
-//#TODO: solve corrupted size vs. prev_size
-//#Aborted (core dumped)
-    //cat_1.delete_input();
-    //cat_2.delete_input();
-    
+    cat_1.delete_input();
+    cat_2.delete_input();
     
     
     //===============================
@@ -129,8 +125,6 @@ int main(int argc, char **argv){
     
     //write results
     corr.write(p, p.fname_out);
-    
-    
     
     return 0;
     

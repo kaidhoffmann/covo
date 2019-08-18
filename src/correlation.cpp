@@ -25,8 +25,10 @@ double correlation::min_samp_dist(
     const std::vector < std::vector < double > > & edge_1,
     const std::vector < std::vector < double > > & edge_2){
     
-    //declare and initialize
-    double dist_min = distance(edge_1[0], edge_2[0]);
+    double dist_min = 0;
+    
+    //initialize
+    if(edge_1.size()>0 && edge_2.size()>0) distance(edge_1[0], edge_2[0]);
     
     for(int i=0; i < edge_1.size(); i++){
         for(int j=0; j < edge_2.size(); j++){
@@ -213,17 +215,15 @@ void correlation::sums_for_sample_combinations(const parameters p, catalogue & c
     
     if(p.verbose > 1){std::cout<<"# remaining cells: " << std::endl;}
     
-//TODO: try running with some r12_v1a etc ocmpinations tuned off in parameters file..
-    
     for(int i=0; i < cat_1.samp.size(); i++){
         
         if(p.verbose > 1){ print_cell_num(cat_1.samp.size(), i); }
 
         std::vector < vars >  sums_i;
         for(int j=0; j < cat_2.samp.size(); j++){
-
+        
             double dist_samps = min_samp_dist(cat_1.samp[i].edge, cat_2.samp[j].edge);
-            
+
             if(dist_samps <= p.r_max){
                 vars sums_ij = sums_pairs(p, cat_1.samp[i].obj, cat_2.samp[j].obj);
                 sums_i.push_back(sums_ij);
@@ -232,7 +232,6 @@ void correlation::sums_for_sample_combinations(const parameters p, catalogue & c
         
         sums_samps.push_back(sums_i);
     }
-    
 }
 
 
