@@ -222,12 +222,6 @@ void healpix::pix2ang_nest (int pix, double &theta, double &phi){
     theta = acos(z);
 }
 
-// ==========================================================
-//
-// ==========================================================
-//void healpix::make_cells_IDs(long nside);
-    
-
 
 // ==========================================================
 //
@@ -250,13 +244,9 @@ void healpix::make_mask(int nside, const std::vector <double> theta_lim, const s
         double theta, phi;    
         pix2ang_nest (pix, theta, phi);
         
-        // marcheck if angles are outside of limits
+        // check if angles are outside of limits
         if(theta_lim[0] <= theta && theta <= theta_lim[1] && phi_lim[0] <= phi && phi <= phi_lim[1]){
             c.masked = false;
-            
-            std::vector <double> pos_ang {2.3,theta,phi};
-            std::vector <double> pos_cart = sphere_to_cart(pos_ang);
-        
         }else{
             c.masked = true;
         }
@@ -266,7 +256,7 @@ void healpix::make_mask(int nside, const std::vector <double> theta_lim, const s
         //test of healpixels lie partly outside of range by
         //looping over points on 4 border lines and mask the cells they hit
         
-        int Nbin_ang = 1000;
+        int Nbin_ang = 10000;
 
         double dtheta = (theta_lim[1]-theta_lim[0]) / double(Nbin_ang);
         double dphi = (phi_lim[1]-phi_lim[0]) / double(Nbin_ang);

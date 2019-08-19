@@ -14,7 +14,7 @@ class catalogue{
     
                       
     int pos_to_ID_cart(
-        const std::vector < int > & numb_jk,
+        const std::vector < int > & numb_jk_cart,
         const std::vector < double > & pos,
         const std::vector < std::vector < double > > & pos_limits,
         const std::vector < double > & Lcell);
@@ -39,7 +39,8 @@ class catalogue{
     };
     
    
-    std::vector < std::vector < double > > limits(sample smp);
+    std::vector < std::vector < double > > limits_cart(sample smp);
+    std::vector < std::vector < double > > limits_sphere(sample smp);
     
     std::vector < sample > samp;
     
@@ -51,7 +52,7 @@ class catalogue{
     
     void normalize_vectors();
    
-    void make_samples_cart(std::vector < int > & numb_jk);
+    void make_samples_cart(const parameters p);
 
     void make_samples_healpix(const parameters p);
     

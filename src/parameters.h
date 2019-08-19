@@ -8,10 +8,12 @@
 
 #include <string>
 #include <vector>
+#include <sstream> 
 
 class parameters{
     
     std::string get_param(std::string fname_param_file, std::string param_name);
+
     std::vector<int> extract_numbers_int(std::string str);
     std::vector<double> extract_numbers_double(std::string str);
     
@@ -25,9 +27,17 @@ class parameters{
     
     std::vector <int> cols_pos, cols_vec_a, cols_vec_b;
     
-    std::string type_subsample;
+    std::vector <double> x_lim, y_lim, z_lim;
     
-    std::vector <int> numb_jk;
+    std::vector <double> r_lim, theta_lim, phi_lim;
+    
+    bool auto_limits;
+    
+    std::string type_subsample;
+
+    double nside, nrad;
+    
+    std::vector <int> numb_jk_cart;
     
     void read(std::string fname);
     
@@ -52,7 +62,7 @@ class parameters{
     int numb_rand;
     double rand_seed;    
     std::string fname_rand;
-    std::vector <double> xlim_rand, ylim_rand, zlim_rand;
+    std::vector <double> x_lim_rand, y_lim_rand, z_lim_rand;
     
 };
 

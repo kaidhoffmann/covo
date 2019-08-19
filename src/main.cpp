@@ -18,6 +18,7 @@
 int main(int argc, char **argv){
     
 
+    
     //===============================
     // read parameters
     //===============================
@@ -31,8 +32,10 @@ int main(int argc, char **argv){
     
     parameters p;
     
+    std::cout<<"test1"<<std::endl;
     p.read(fname_param);
-            
+    std::cout<<"test2"<<std::endl;
+
     if(argc>=3){
         p.fname_cat_1 = argv[2];
     }
@@ -52,6 +55,7 @@ int main(int argc, char **argv){
     if(p.verbose > 1) p.print();
     
     if(!p.check()) exit (EXIT_FAILURE);
+
 
     
     //===============================
@@ -101,8 +105,8 @@ int main(int argc, char **argv){
         cat_1.make_samples_healpix(p);
         cat_2.make_samples_healpix(p);
     }else{
-        cat_1.make_samples_cart(p.numb_jk);
-        cat_2.make_samples_cart(p.numb_jk);
+        cat_1.make_samples_cart(p);
+        cat_2.make_samples_cart(p);
     }
     
     //delete original input catalogue to free memory

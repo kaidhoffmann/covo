@@ -9,6 +9,7 @@
 #include <sstream> 
 #include <algorithm>
 #include <vector>
+#include <cmath>
 #include "parameters.h"
 
 
@@ -41,15 +42,36 @@ void parameters::read(std::string fname){
 
     header_out = (get_param(fname, "header_out") == "true");
     
+    
     //column numbers with vector components in input catalogue
     cols_pos = extract_numbers_int( get_param(fname, "cols_pos") );
     cols_vec_a = extract_numbers_int( get_param(fname, "cols_vec_a") );
     cols_vec_b = extract_numbers_int( get_param(fname, "cols_vec_b") );
     
+    auto_limits = (get_param(fname, "auto_limits") == "true");
+    
     type_subsample = get_param(fname, "type_subsample");
+  
+    r_lim = extract_numbers_double( get_param(fname, "r_lim") );
+    theta_lim = extract_numbers_double( get_param(fname, "theta_lim") );
+    phi_lim = extract_numbers_double( get_param(fname, "phi_lim") );
+    
+    
+    x_lim = extract_numbers_double( get_param(fname, "x_lim") );
+    y_lim = extract_numbers_double( get_param(fname, "y_lim") );
+    z_lim = extract_numbers_double( get_param(fname, "z_lim") );
+    
+    //convert angular limits from degree to radians
+    for(int ang_bin=0; ang_bin < 2 ;ang_bin++){
+        theta_lim[ang_bin] *= M_PI/180.;
+        phi_lim[ang_bin] *= M_PI/180.;
+    }
+    
+    nside = std::stoi( get_param(fname, "nside") );
+    nrad = std::stoi( get_param(fname, "nrad") );
     
     //number of jk samples per axis
-    numb_jk = extract_numbers_int( get_param(fname, "numb_jk") );
+    numb_jk_cart = extract_numbers_int( get_param(fname, "numb_jk_cart") );
   
     
     //binning variables
@@ -75,9 +97,9 @@ void parameters::read(std::string fname){
     
     //variable for generating random catalogue
     numb_rand = std::stoi( get_param(fname, "numb_rand") );
-    xlim_rand = extract_numbers_double( get_param(fname, "xlim_rand") );
-    ylim_rand = extract_numbers_double( get_param(fname, "ylim_rand") );
-    zlim_rand = extract_numbers_double( get_param(fname, "zlim_rand") );
+    x_lim_rand = extract_numbers_double( get_param(fname, "x_lim_rand") );
+    y_lim_rand = extract_numbers_double( get_param(fname, "y_lim_rand") );
+    z_lim_rand = extract_numbers_double( get_param(fname, "z_lim_rand") );
   
     make_rand = (get_param(fname, "make_rand") == "true");
     rand_seed = std::stod( get_param(fname, "rand_seed") );
@@ -105,8 +127,8 @@ bool parameters::check(){
         eishockey = false;
     }
     
-    if(numb_jk.size() !=dim){
-        std::cerr<<"# ##### ERROR: " << numb_jk.size() << " dimensions for numb_jk sampling, but " << dim << " columns for position #####"<<std::endl;
+    if(numb_jk_cart.size() !=dim){
+        std::cerr<<"# ##### ERROR: " << numb_jk_cart.size() << " dimensions for numb_jk_cart sampling, but " << dim << " columns for position #####"<<std::endl;
         eishockey = false;
     }
 
@@ -125,7 +147,22 @@ bool parameters::check(){
         eishockey = false;        
     }
     
-        std::cout<<std::endl;
+    
+    if(nside < 1){
+        //TODO: check order
+        std::cerr<<"# ##### ERROR: nside must be power of 2 and > 0" << std::endl;
+        eishockey = false;
+    }
+    
+    if(nrad < 1){
+        std::cerr<<"# ##### ERROR: nrad must be > 0" << std::endl;
+        eishockey = false;        
+    }
+    
+    //TODO:
+    //check if limits are set correctly (min-max, not max, min) to avoid negative dr, dphi, dtheta
+    
+    std::cout<<std::endl;
 
     
     return eishockey;
@@ -156,22 +193,61 @@ void parameters::print(){
     std::cout << "# header_out: " << header_out << std::endl;
 
     std::cout<<std::endl;
-
     
     int Njk=1;
-    for(int i = 0; i < numb_jk.size(); i++){ Njk *= numb_jk[i]; }
-    
+    for(int i = 0; i < numb_jk_cart.size(); i++){ Njk *= numb_jk_cart[i]; }
     
     std::cout << "# type_subsample: ";
     std::cout << type_subsample << std::endl;
-    std::cout<<std::endl;
-    
-    
-    std::cout << "# JK samples per axis: ";
-    for(int i = 0; i < numb_jk.size(); i++){ std::cout<<numb_jk[i]<<" "; }
-    std::cout << " => " << Njk << " samples in total" << std::endl;
-    std::cout<<std::endl;
+       
+    std::cout << "# auto_limits: " << auto_limits << std::endl;
 
+    if(type_subsample=="cartesian"){
+
+        if(!auto_limits){
+            
+            std::cout<<"# x_lim: ";
+            for(int i = 0; i < x_lim.size(); i++){ std::cout<<x_lim[i]<<" "; }
+            std::cout<<std::endl;
+
+            std::cout<<"# y_lim: ";
+            for(int i = 0; i < y_lim.size(); i++){ std::cout<<y_lim[i]<<" "; }
+            std::cout<<std::endl;
+
+            std::cout<<"# z_lim: ";
+            for(int i = 0; i < z_lim.size(); i++){ std::cout<<z_lim[i]<<" "; }
+            std::cout<<std::endl;
+        }
+        
+        std::cout << "# JK samples per axis: ";
+        for(int i = 0; i < numb_jk_cart.size(); i++){ std::cout<<numb_jk_cart[i]<<" "; }
+        std::cout << " => " << Njk << " samples in total" << std::endl;        
+        std::cout<<std::endl;
+    }
+    
+    
+    if(type_subsample=="healpix"){
+        
+        if(!auto_limits){
+            
+            std::cout<<"# r_lim: ";
+            for(int i = 0; i < r_lim.size(); i++){ std::cout<<r_lim[i]<<" "; }
+            std::cout<<std::endl;
+
+            std::cout<<"# theta_lim: ";
+            for(int i = 0; i < theta_lim.size(); i++){ std::cout<<theta_lim[i] * 180./M_PI <<" "; }
+            std::cout<<std::endl;
+
+            std::cout<<"# phi_lim: ";
+            for(int i = 0; i < phi_lim.size(); i++){ std::cout<<phi_lim[i] * 180./M_PI<<" "; }
+            std::cout<<std::endl;
+        }
+        
+        std::cout << "# nside: " << nside << std::endl;
+        std::cout << "# nrad: " << nrad << std::endl;
+        std::cout<<std::endl;
+    }
+    
 
     std::cout<<"# columns in input catalogue: "<< std::endl;
 
@@ -209,24 +285,28 @@ void parameters::print(){
     
     
     std::cout<<"# make_rand = "<<make_rand<<std::endl;
-    std::cout<<"# rand_seed = "<<rand_seed<<std::endl;
-    std::cout<<"# fname_rand = "<<fname_rand<<std::endl;
     
+    if(make_rand){
+        
+        std::cout<<"# rand_seed = "<<rand_seed<<std::endl;
+        std::cout<<"# fname_rand = "<<fname_rand<<std::endl;
+        
+        std::cout<<"# numb_rand = "<<numb_rand<<std::endl;
+        
+        std::cout<<"# x_lim_rand: ";
+        for(int i = 0; i < x_lim_rand.size(); i++){ std::cout<<x_lim_rand[i]<<" "; }
+        std::cout<<std::endl;
+
+        std::cout<<"# y_lim_rand: ";
+        for(int i = 0; i < y_lim_rand.size(); i++){ std::cout<<y_lim_rand[i]<<" "; }
+        std::cout<<std::endl;
+
+        std::cout<<"# z_lim_rand: ";
+        for(int i = 0; i < z_lim_rand.size(); i++){ std::cout<<z_lim_rand[i]<<" "; }
+        std::cout<<std::endl;
+
+    }
     
-    std::cout<<"# numb_rand = "<<numb_rand<<std::endl;
-    
-    std::cout<<"# xlim_rand: ";
-    for(int i = 0; i < xlim_rand.size(); i++){ std::cout<<xlim_rand[i]<<" "; }
-    std::cout<<std::endl;
-
-    std::cout<<"# ylim_rand: ";
-    for(int i = 0; i < ylim_rand.size(); i++){ std::cout<<ylim_rand[i]<<" "; }
-    std::cout<<std::endl;
-
-    std::cout<<"# zlim_rand: ";
-    for(int i = 0; i < zlim_rand.size(); i++){ std::cout<<zlim_rand[i]<<" "; }
-    std::cout<<std::endl;
-
     std::cout << "# ============================================" << std::endl;
 };
 

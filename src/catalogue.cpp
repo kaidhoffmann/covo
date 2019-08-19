@@ -95,9 +95,9 @@ void catalogue::read(const parameters p, const std::string filename){
 
 
 // ==========================================================
-// find minima and maxima of positions
+// find minima and maxima of positions in cartesian cooredinates
 // ==========================================================
-std::vector < std::vector < double > > catalogue::limits(sample smp){
+std::vector < std::vector < double > > catalogue::limits_cart(sample smp){
 
     std::vector < std::vector < double > > lim;
 
@@ -123,40 +123,49 @@ std::vector < std::vector < double > > catalogue::limits(sample smp){
     }
     
     return lim;
-    
-    //std::cout<<pos_min[0]<<"\t"<<pos_max[0]<<std::endl;
 }
 
+// ==========================================================
+// find minima and maxima of positions in spherical cooredinates
+// ==========================================================
+std::vector < std::vector < double > > catalogue::limits_sphere(sample smp){
 
+    std::vector < std::vector < double > > lim;
 
-//===========================================================
-// convert cellID to grid coordinates
-//===========================================================
-//WARNING: max cells per axis = (4294967295)^(1÷3) = 1625
-// void ID_to_pos(const unsigned long ID, const int DIM, int pos[3]){ 
-//     
-//     pos[2] = int(ID / DIM / DIM);
-//     pos[1] = int(ID / DIM) - pos[2]*DIM;
-//     pos[0] = ID - pos[1]*DIM - pos[2]*DIM*DIM;
-// }
+    //initilize min/max position with first position vector
+    std::vector < double > init = cart_to_sphere(smp.obj[0].pos);
+    
+    for(int i=0; i< init.size(); i++){
+        lim.push_back({init[i],init[i]});
+    }
 
+    //search for min/max
+    for(int i=0; i< smp.obj.size(); i++){
+        
+        std::vector <double> pos_sphere = cart_to_sphere(smp.obj[i].pos);
 
+        for(int j=0; j<pos_sphere.size(); j++){
+            
+            
+            if(pos_sphere[j] < lim[j][0]){
+                lim[j][0] = pos_sphere[j];
+            }
 
-//===========================================================
-// convert cellID to grid coordinates
-//===========================================================
-//WARNING: max cells per axis = (4294967295)^(1÷3) = 1625
-// unsigned long pos_to_ID_cart(const int DIM, const int I, const int J, const int K){    
-//     return I + J*DIM + K*DIM*DIM;
-// }
-
+            if(pos_sphere[j] > lim[j][1]){
+                lim[j][1] = pos_sphere[j];
+            }
+        }  
+    }
+    
+    return lim;
+}
 
 
 // ==========================================================
 // obtain cell ID for object from its position
 // ==========================================================
 int catalogue::pos_to_ID_cart(
-    const std::vector < int > & numb_jk,
+    const std::vector < int > & numb_jk_cart,
     const std::vector < double > & pos,
     const std::vector < std::vector < double > > & pos_limits,
     const std::vector < double > & Lcell){
@@ -169,10 +178,10 @@ int catalogue::pos_to_ID_cart(
     }
     
     //TODO: make for n dimensions
-    if(numb_jk.size()==3){            
+    if(numb_jk_cart.size()==3){            
         int ID =
-        jk_coords[2] * numb_jk[1] *numb_jk[2] +
-        jk_coords[1] * numb_jk[1] +
+        jk_coords[2] * numb_jk_cart[1] *numb_jk_cart[2] +
+        jk_coords[1] * numb_jk_cart[1] +
         jk_coords[0];
 
         return ID;
@@ -191,12 +200,11 @@ int catalogue::pos_to_ID_cart(
 // - samples build using 3d grid mesh, spannig the the volume covered by the input catalogue
 // - should be used for data in box.
 // ==========================================================
-void catalogue::make_samples_cart(std::vector < int > & numb_jk){
-
+void catalogue::make_samples_cart(const parameters p){
     
     //total number of samples
     int Nsamp=1;
-    for(int i = 0; i < numb_jk.size(); i++){ Nsamp *= numb_jk[i]; }
+    for(int i = 0; i < p.numb_jk_cart.size(); i++){ Nsamp *= p.numb_jk_cart[i]; }
 
     
     //initialize samples
@@ -206,9 +214,15 @@ void catalogue::make_samples_cart(std::vector < int > & numb_jk){
     }
     
     
-    //get limits of input cataloue
-    std::vector < std::vector < double > > pos_limits = limits(input);
-    //and add some tollerance to maxima to avoid that galaxies with
+    //get limits of input cataloue..
+    std::vector < std::vector < double > > pos_limits;
+    if(p.auto_limits){
+        pos_limits = limits_cart(input);
+    }else{
+        pos_limits = {p.x_lim, p.y_lim, p.z_lim};
+    }
+    
+    //..and add some tollerance to maxima to avoid that galaxies with
     //max position beeing put in JK sample with NK+1, which leads to segfault..
     for(int i=0; i<pos_limits.size(); i++){ pos_limits[i][1] *=1.00000001; }
     
@@ -216,21 +230,21 @@ void catalogue::make_samples_cart(std::vector < int > & numb_jk){
     //length of sample cells along each dimension
     std::vector < double > Lcell;
     for(int i=0; i<pos_limits.size(); i++){
-        Lcell.push_back( (pos_limits[i][1] - pos_limits[i][0]) / numb_jk[i] );
+        Lcell.push_back( (pos_limits[i][1] - pos_limits[i][0]) / p.numb_jk_cart[i] );
     }
     
     
     //add objects to samples
     for(int i=0; i<input.obj.size();i++){
-        int ID = pos_to_ID_cart(numb_jk, input.obj[i].pos, pos_limits, Lcell);
+        int ID = pos_to_ID_cart(p.numb_jk_cart, input.obj[i].pos, pos_limits, Lcell);
         samp[ID].obj.push_back(input.obj[i]);
     }
     
     
     //make sample center and edges    
-    for(int i = 0; i < numb_jk[0]; i++){
-        for(int j = 0; j < numb_jk[1]; j++){    
-            for(int k = 0; k < numb_jk[2]; k++){
+    for(int i = 0; i < p.numb_jk_cart[0]; i++){
+        for(int j = 0; j < p.numb_jk_cart[1]; j++){    
+            for(int k = 0; k < p.numb_jk_cart[2]; k++){
                 
                 std::vector <double> center = {
                     (i+0.5)*Lcell[0]-fabs(pos_limits[0][0]),
@@ -238,7 +252,7 @@ void catalogue::make_samples_cart(std::vector < int > & numb_jk){
                     (k+0.5)*Lcell[2]-fabs(pos_limits[2][0])};
 
                     
-                int ID = pos_to_ID_cart(numb_jk, center, pos_limits, Lcell);
+                int ID = pos_to_ID_cart(p.numb_jk_cart, center, pos_limits, Lcell);
                 
                 samp[ID].cent = center;
                 
@@ -272,43 +286,27 @@ void catalogue::make_samples_cart(std::vector < int > & numb_jk){
 // ==========================================================
 void catalogue::make_samples_healpix(const parameters p){
     
-    //-----------------------------------------------
-    int nside = 8;
-    int Nbin_rad = 2;
+    //get limits of input cataloue in spherical coordinates r, theta, phi
+    std::vector < std::vector < double > > pos_limits;
+    if(p.auto_limits){
+        pos_limits = limits_sphere(input);
+    }else{
+        pos_limits = {p.r_lim, p.theta_lim, p.phi_lim};
+    }
     
-    //TODO: get this from param file
-    std::vector <double> r_lim,theta_lim, phi_lim;
-    
-    r_lim.push_back(200000);
-    r_lim.push_back(300000);
-
-    theta_lim.push_back(0*M_PI/180);
-    theta_lim.push_back(90*M_PI/180);
-
-    phi_lim.push_back(0*M_PI/180);
-    phi_lim.push_back(90*M_PI/180);
-    
-    //todo and new parameters:
-    // -option for healpix sampling: JK_type = healpix, box
-    // add parameters: r_lim, theta_lim, phi_lim
-    
-    
-    
-    
-    //-----------------------------------------------
-    
-
     //make healpix mask
     healpix hp;
-    hp.make_mask(nside, theta_lim, phi_lim);
+    //hp.make_mask(p.nside, p.theta_lim, p.phi_lim);
+    hp.make_mask(p.nside, pos_limits[1], pos_limits[2]);
     
     //radial bin width//
-    double dr = (r_lim[1] - r_lim[0]) / double(Nbin_rad);
+    //double dr = (p.r_lim[1] - p.r_lim[0]) / double(p.nrad);
+    double dr = (pos_limits[0][1] - pos_limits[0][0]) / double(p.nrad);
 
     //initialize samples, add radial bin and healpix ID    
     for(int i=0; i<hp.cells.size(); i++){//loop over healpix cells
         if(!hp.cells[i].masked){
-            for(int j=0; j<Nbin_rad; j++){//loop over radial bins
+            for(int j=0; j<p.nrad; j++){//loop over radial bins
                 sample s;
                 s.hp_ID = hp.cells[i].ID;
                 s.bin_rad = j;
@@ -316,7 +314,6 @@ void catalogue::make_samples_healpix(const parameters p){
             }
         }
     }
-
     
     
     //add objects to samples
@@ -324,7 +321,7 @@ void catalogue::make_samples_healpix(const parameters p){
         
         std::vector < double > pos_sphere = cart_to_sphere(input.obj[i].pos);
         
-        int bin_rad = int((pos_sphere[0] - r_lim[0]) / dr );
+        int bin_rad = int((pos_sphere[0] - p.r_lim[0]) / dr );
     
         long hp_ID = hp.ang2pix_nest(pos_sphere[1], pos_sphere[2]);
          
@@ -464,7 +461,7 @@ void catalogue::make_random(const parameters p){
         
         object obj_rand;
         
-        obj_rand.pos = rand_vec_box(p.xlim_rand, p.ylim_rand, p.zlim_rand);
+        obj_rand.pos = rand_vec_box(p.x_lim_rand, p.y_lim_rand, p.z_lim_rand);
         obj_rand.vec_a = rand_vec_sphere(radius);
         obj_rand.vec_b = rand_vec_sphere(radius);
         

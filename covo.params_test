@@ -1,37 +1,40 @@
 
-# input catalogues
+# set zero for silence
+verbose = 2
+
+
+# ==== input catalogues ====
 fname_cat_1 = ./catalogues/random_1.csv
 fname_cat_2 = ./catalogues/random_2.csv
 
 
-# variables for output filename
+# ==== variables for output filename ====
 # (set fname_out = auto to generate filename from prefix, suffix and extension)
 fname_out = auto
 fname_out_prefix = w
 fname_out_suffix = test_555_d0
 fname_out_extention = csv
 
-
 dir_out = ./results/
 
 
-# delimiter for input catalogue and output file
+# ==== delimiter for input catalogue and output file ====
 # (tab for "\t", space for " ", anything else will be used directly)
 delim_in = ,
 delim_out = space
 
 
-# add header to output file
+# ==== add header to output file ====
 header_out = true
 
 
-# columns for positions and vectors in input file
+# ==== columns for positions and vectors in input file ====
 cols_pos = 0,1,2
 cols_vec_a = 3,4,5
 cols_vec_b = 6,7,8
 
 
-# combinations for which to compute inner product correlations
+# ==== combinations for which to compute inner product correlations ====
 r12_v1a = true
 r12_v1b = true
 r12_v2a = true
@@ -42,33 +45,57 @@ v1a_v2b = true
 v1b_v2a = true
 
 
-# set zero for silence
-verbose = 2
-
-# method for building subsamples
-# ("cartesian" for rectangular subvolumes, "healpix" for healpix samples on sphere with radial bins)
-#type_subsample = cartesian
-type_subsample = healpix
-
-
-# jack-knife samples per axis
-numb_jk  = 4,4,4
-
-
-# binning
+# ==== binning ====
 r_min = 1000
 r_max = 20000
 numb_bin = 10
 lg_bins = true
 
+# exponent for inner product
+# exp_ip = 2
 
-# random catalogue
+
+
+# ==== subsamples for jack-knife errors ====
+# method for building subsamples ("cartesian" for rectangular subvolumes, "healpix" for healpix samples on sphere with radial bins)
+type_subsample = cartesian
+
+# set number of healpix samples on sphere via nside
+nside = 8
+# number of radial bins for healpix sampling
+nrad = 3
+
+# parameters for cartesian subsamples (boxes)
+# split volume into (nx,ny,nz) pieces along each axis => nx*ny*nz samples in total
+numb_jk_cart  = 4,4,4
+
+
+
+# ==== min/max positions of positions in catalogue =====
+
+# cartesian coordinates
+x_lim = 0,300000
+y_lim = 0,300000
+z_lim = 0,300000
+
+# spherical coordinates
+r_lim = 200000, 300000
+theta_lim = 0, 90
+phi_lim = 0, 90
+
+# ignore limits above and find them automatically from input catalogue (only if both catalogs are the same)
+auto_limits = true
+
+#periodic_box = true
+
+
+# ==== random catalogue ====
 
 make_rand = false
 rand_seed = 2134
 fname_rand = ./catalogues/random_1.csv
 
 numb_rand = 60000
-xlim_rand = 0,200
-ylim_rand = 0,200
-zlim_rand = 0,200
+x_lim_rand = 0,200
+y_lim_rand = 0,200
+z_lim_rand = 0,200
