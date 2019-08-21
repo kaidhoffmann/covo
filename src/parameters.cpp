@@ -52,28 +52,33 @@ void parameters::read(std::string fname){
     
     type_subsample = get_param(fname, "type_subsample");
   
-    r_lim = extract_numbers_double( get_param(fname, "r_lim") );
-    theta_lim = extract_numbers_double( get_param(fname, "theta_lim") );
-    phi_lim = extract_numbers_double( get_param(fname, "phi_lim") );
     
+    if(!auto_limits){
+
+        r_lim = extract_numbers_double( get_param(fname, "r_lim") );
+        theta_lim = extract_numbers_double( get_param(fname, "theta_lim") );
+        phi_lim = extract_numbers_double( get_param(fname, "phi_lim") );
     
-    x_lim = extract_numbers_double( get_param(fname, "x_lim") );
-    y_lim = extract_numbers_double( get_param(fname, "y_lim") );
-    z_lim = extract_numbers_double( get_param(fname, "z_lim") );
-    
-    //convert angular limits from degree to radians
-    for(int ang_bin=0; ang_bin < 2 ;ang_bin++){
-        theta_lim[ang_bin] *= M_PI/180.;
-        phi_lim[ang_bin] *= M_PI/180.;
+        x_lim = extract_numbers_double( get_param(fname, "x_lim") );
+        y_lim = extract_numbers_double( get_param(fname, "y_lim") );
+        z_lim = extract_numbers_double( get_param(fname, "z_lim") );
+        
+        //convert angular limits from degree to radians
+        for(int i=0; i < 2 ;i++){
+            theta_lim[i] *= M_PI/180.;
+            phi_lim[i] *= M_PI/180.;
+        }
+
     }
     
+  
+    // parameters for healpix sampling
     nside = std::stoi( get_param(fname, "nside") );
     nrad = std::stoi( get_param(fname, "nrad") );
     
-    //number of jk samples per axis
+    //number of jk samples per axis for cartesian subsampling
     numb_jk_cart = extract_numbers_int( get_param(fname, "numb_jk_cart") );
   
-    
     //binning variables
     numb_bin = std::stoi( get_param(fname, "numb_bin") );
     r_min = std::stod( get_param(fname, "r_min") );

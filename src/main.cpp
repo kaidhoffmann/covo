@@ -32,9 +32,7 @@ int main(int argc, char **argv){
     
     parameters p;
     
-    std::cout<<"test1"<<std::endl;
     p.read(fname_param);
-    std::cout<<"test2"<<std::endl;
 
     if(argc>=3){
         p.fname_cat_1 = argv[2];
@@ -78,7 +76,6 @@ int main(int argc, char **argv){
         }
         
     }else{
-            
         
         if(p.verbose > 1) std::cout<<std::endl<<"# ==== read data ====" << std::endl;
 
@@ -88,13 +85,44 @@ int main(int argc, char **argv){
     
         if(p.fname_cat_1==p.fname_cat_2){
             cat_2 = cat_1;
-            if(p.verbose > 1) std::cout<<"# catalogue 2 = catalogue 1 "<<std::endl;
+            if(p.verbose > 1) std::cout<<"\n# catalogue 2 = catalogue 1 "<<std::endl;
         }else{
             cat_2.read(p, p.fname_cat_2);
-            if(p.verbose > 1) std::cout<<"# size of catalogue 2: "<<cat_2.input.obj.size()<<std::endl;        
+            if(p.verbose > 1) std::cout<<"\n# size of catalogue 2: "<<cat_2.input.obj.size()<<std::endl;        
         }
     
     }
+    
+    //find min/max positions
+    cat_1.get_pos_limits(p);
+    cat_2.get_pos_limits(p);
+    
+    if(p.verbose>0){
+        std::cout<<"\n# min. / max. position in catalogue 1"<<std::endl;
+        cat_1.show_pos_limits();
+        std::cout<<std::endl;
+
+        std::cout<<"# min. / max. position in catalogue 2"<<std::endl;
+        cat_2.show_pos_limits();
+        std::cout<<std::endl;
+    }
+
+    
+    //find overlap region between catalogs
+    cut_overlap(p, cat_1, cat_2);
+
+    
+    //print again, just for testing
+    if(p.verbose>0){
+        std::cout<<"\n# min. / max. position in catalogue 1"<<std::endl;
+        cat_1.show_pos_limits();
+        std::cout<<std::endl;
+
+        std::cout<<"# min. / max. position in catalogue 2"<<std::endl;
+        cat_2.show_pos_limits();
+        std::cout<<std::endl;
+    }
+    
     
     //normalize input vectors
     cat_1.normalize_vectors();
@@ -104,10 +132,22 @@ int main(int argc, char **argv){
     if(p.type_subsample=="healpix"){
         cat_1.make_samples_healpix(p);
         cat_2.make_samples_healpix(p);
+        
     }else{
         cat_1.make_samples_cart(p);
         cat_2.make_samples_cart(p);
     }
+    
+    /*for(int i=0; i < cat_1.samp.size(); i++){
+        for(int j=0; j < cat_1.samp[i].obj.size(); j++){
+
+            std::cout
+                << cat_1.samp[i].obj[j].pos[0] <<","
+                << cat_1.samp[i].obj[j].pos[1] <<","
+                << cat_1.samp[i].obj[j].pos[2] <<","
+                << i << std::endl;
+        }
+    }*/
     
     //delete original input catalogue to free memory
     cat_1.delete_input();

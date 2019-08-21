@@ -39,8 +39,17 @@ class catalogue{
     };
     
    
-    std::vector < std::vector < double > > limits_cart(sample smp);
-    std::vector < std::vector < double > > limits_sphere(sample smp);
+    std::vector < std::vector < double > > find_limits_cart(sample smp);
+    std::vector < std::vector < double > > find_limits_sphere(sample smp);
+    
+    void get_pos_limits(const parameters p);
+
+    void show_pos_limits();
+
+    void cut_input(const parameters p);
+    
+    std::vector < std::vector < double > > pos_limits_cart, pos_limits_sphere;
+    
     
     std::vector < sample > samp;
     
@@ -63,5 +72,9 @@ class catalogue{
     void write_input(const parameters p, const std::string filename);
 
 };
+
+
+void cut_overlap(const parameters p, catalogue & cat_1, catalogue & cat_2);
+
 
 #endif // CATALOGUE_H
