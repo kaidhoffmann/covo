@@ -65,7 +65,8 @@ int main(int argc, char **argv){
     if(p.make_rand){
         if(p.verbose > 1) std::cout<<std::endl<<"# ==== make random catalogue ====" << std::endl;
         
-        cat_1.make_random(p);
+        //cat_1.make_random_box (p);
+        cat_1.make_random_shell (p);
         cat_1.input = cat_1.random;
         cat_1.write_input(p, p.fname_rand);
         cat_2.input = cat_1.input;
@@ -138,7 +139,7 @@ int main(int argc, char **argv){
         cat_2.make_samples_cart(p);
     }
     
-    /*for(int i=0; i < cat_1.samp.size(); i++){
+    for(int i=0; i < cat_1.samp.size(); i++){
         for(int j=0; j < cat_1.samp[i].obj.size(); j++){
 
             std::cout
@@ -147,7 +148,7 @@ int main(int argc, char **argv){
                 << cat_1.samp[i].obj[j].pos[2] <<","
                 << i << std::endl;
         }
-    }*/
+    }
     
     //delete original input catalogue to free memory
     cat_1.delete_input();

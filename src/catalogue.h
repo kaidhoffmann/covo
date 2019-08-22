@@ -20,6 +20,7 @@ class catalogue{
         const std::vector < double > & Lcell);
     
     std::vector<double> rand_vec_sphere(double radius);
+    std::vector<double> rand_vec_shell(const std::vector<double> & intrsq_lim, const std::vector<double> & cos_theta_lim, const std::vector<double> & phi_lim);
     std::vector<double> rand_vec_box(std::vector<double> x_lim, std::vector<double> y_lim, std::vector<double> z_lim);
 
     public:
@@ -67,7 +68,9 @@ class catalogue{
     
     void delete_input();
 
-    void make_random(const parameters p);
+    void make_random_box(const parameters p);
+
+    void make_random_shell(const parameters p);
 
     void write_input(const parameters p, const std::string filename);
 

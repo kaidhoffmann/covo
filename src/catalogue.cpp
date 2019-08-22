@@ -138,15 +138,19 @@ std::vector < std::vector < double > > catalogue::find_limits_sphere(sample smp)
     //initilize min/max position with first position vector
     std::vector < double > init = cart_to_sphere(smp.obj[0].pos);
     
+    //std::cout<<init[0]<<"\t"<<init[1]<<"\t"<<init[2]<<std::endl;
+    
     for(int i=0; i< init.size(); i++){
         lim.push_back({init[i],init[i]});
     }
 
+    //std::cout<<lim[2][0]<<"\t"<<lim[2][1]<<std::endl;
+    
     //search for min/max
     for(int i=0; i< smp.obj.size(); i++){
         
         std::vector <double> pos_sphere = cart_to_sphere(smp.obj[i].pos);
-
+        
         for(int j=0; j<pos_sphere.size(); j++){
             
             
@@ -210,7 +214,6 @@ void catalogue::get_pos_limits(const parameters p){
         pos_limits_cart = {p.x_lim, p.y_lim, p.z_lim};
         pos_limits_sphere = {p.r_lim, p.theta_lim, p.phi_lim};
     }
-
 };
 
 
@@ -220,13 +223,15 @@ void catalogue::get_pos_limits(const parameters p){
 // ==========================================================
 void catalogue::show_pos_limits(){
 
+    double f = 180/M_PI;
+    
     std::cout <<"# "<< pos_limits_cart[0][0] <<" < x < "<< pos_limits_cart[0][1] <<std::endl;
     std::cout <<"# "<< pos_limits_cart[1][0] <<" < y < "<< pos_limits_cart[1][1] <<std::endl;
     std::cout <<"# "<< pos_limits_cart[2][0] <<" < z < "<< pos_limits_cart[2][1] <<std::endl;
 
     std::cout <<"# "<< pos_limits_sphere[0][0] <<" < r < "<< pos_limits_sphere[0][1] <<std::endl;
-    std::cout <<"# "<< pos_limits_sphere[1][0] <<" < theta < "<< pos_limits_sphere[1][1] <<std::endl;
-    std::cout <<"# "<< pos_limits_sphere[2][0] <<" < phi < "<< pos_limits_sphere[2][1] <<std::endl;
+    std::cout <<"# "<< pos_limits_sphere[1][0]*f <<" < theta < "<< pos_limits_sphere[1][1]*f <<std::endl;
+    std::cout <<"# "<< pos_limits_sphere[2][0]*f <<" < phi < "<< pos_limits_sphere[2][1]*f <<std::endl;
 };
 
 
@@ -545,6 +550,33 @@ std::vector<double> catalogue::rand_vec_sphere(double radius){
     
 }
 
+// ==========================================================
+// generate random vector on a 3d spehere
+// ==========================================================
+std::vector<double> catalogue::rand_vec_shell(const std::vector<double> & intrsq_lim, const std::vector<double> & cos_theta_lim, const std::vector<double> & phi_lim){
+
+    int prcn=1000000;
+    
+    //inverse transform sampling
+    
+    double intrsq = intrsq_lim[0] + (rand() % prcn)/double(prcn)*(intrsq_lim[1] - intrsq_lim[0]);
+    double r = pow(3*intrsq,1/3.);
+    
+    double cos_theta_rand = cos_theta_lim[0] + (rand() % prcn)/double(prcn)*(cos_theta_lim[1] - cos_theta_lim[0]);
+    double theta_rand = acos(cos_theta_rand);
+    
+    double phi_rand = phi_lim[0] + (rand() % prcn)/double(prcn)*(phi_lim[1] - phi_lim[0]);
+    
+    std::vector< double > vec;
+
+    vec.push_back(r * cos(phi_rand) * sin(theta_rand) );
+    vec.push_back(r * sin(phi_rand) * sin(theta_rand) );
+    vec.push_back(r * cos(theta_rand) );
+    
+    return vec;
+    
+}
+
 
 
 // ==========================================================
@@ -566,13 +598,12 @@ std::vector<double> catalogue::rand_vec_box(std::vector<double> x_lim, std::vect
 
 
 // ==========================================================
-// generate random catalogue
-// - objects with random positions and unit vectors with random positions
+// generate random catalogue in box
+// - objects with random cartesian positions and unit vectors with random directions
 // ==========================================================
-void catalogue::make_random(const parameters p){
+void catalogue::make_random_box(const parameters p){
 
-    
-    int prcn=10000;
+    int prcn=100000;
     
     srand (p.rand_seed);
     
@@ -590,6 +621,36 @@ void catalogue::make_random(const parameters p){
     }
 }
 
+
+// ==========================================================
+// generate random catalogue in shell
+// - objects with random cartesian positions and unit vectors with random directions
+// ==========================================================
+void catalogue::make_random_shell(const parameters p){
+
+    int prcn=100000;
+    
+    double r_vec = 1.0;
+    
+    srand (p.rand_seed);
+    
+    for(int i=0; i<p.numb_rand; i++){
+        
+        object obj_rand;
+        
+        std::vector <double> intrsq_lim = {pow(p.r_lim_rand[0],3)/3., pow(p.r_lim_rand[1],3)/3.};
+       
+        std::vector <double> cos_theta_lim = {cos(p.theta_lim_rand[0]), cos(p.theta_lim_rand[1])};
+        
+        
+        //if(p.mode shell)
+        obj_rand.pos = rand_vec_shell(intrsq_lim, cos_theta_lim, p.phi_lim_rand);
+        obj_rand.vec_a = rand_vec_sphere(r_vec);
+        obj_rand.vec_b = rand_vec_sphere(r_vec);
+        
+        random.obj.push_back(obj_rand);
+    }
+}
 
 
 // ==========================================================

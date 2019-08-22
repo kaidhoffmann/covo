@@ -28,7 +28,6 @@ class parameters{
     std::vector <int> cols_pos, cols_vec_a, cols_vec_b;
     
     std::vector <double> x_lim, y_lim, z_lim;
-    
     std::vector <double> r_lim, theta_lim, phi_lim;
     
     bool auto_limits;
@@ -63,6 +62,7 @@ class parameters{
     double rand_seed;    
     std::string fname_rand;
     std::vector <double> x_lim_rand, y_lim_rand, z_lim_rand;
+    std::vector <double> r_lim_rand, theta_lim_rand, phi_lim_rand;
     
 };
 

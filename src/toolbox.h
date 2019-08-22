@@ -99,13 +99,13 @@ template <typename T> inline std::vector<T> sphere_to_cart(const std::vector<T> 
 // ==========================================================
 template <typename T> inline std::vector<T> cart_to_sphere(const std::vector<T> pos_cart) {
 
-    std::vector<T> pos_sphere;
     
     T r = vabs(pos_cart);
+    T theta = acos(pos_cart[2] / r);
+    T phi = atan2(pos_cart[1],  pos_cart[0]);
+    if(phi < 0){ phi += 2*M_PI; }
     
-    pos_sphere.push_back( r );
-    pos_sphere.push_back( acos(pos_cart[2] / r) );
-    pos_sphere.push_back( atan2(pos_cart[1],  pos_cart[0]) );
+    std::vector<T> pos_sphere {r, theta, phi};
     
     return pos_sphere;
 }

@@ -52,25 +52,20 @@ void parameters::read(std::string fname){
     
     type_subsample = get_param(fname, "type_subsample");
   
-    
-    if(!auto_limits){
+    r_lim = extract_numbers_double( get_param(fname, "r_lim") );
+    theta_lim = extract_numbers_double( get_param(fname, "theta_lim") );
+    phi_lim = extract_numbers_double( get_param(fname, "phi_lim") );
 
-        r_lim = extract_numbers_double( get_param(fname, "r_lim") );
-        theta_lim = extract_numbers_double( get_param(fname, "theta_lim") );
-        phi_lim = extract_numbers_double( get_param(fname, "phi_lim") );
+    x_lim = extract_numbers_double( get_param(fname, "x_lim") );
+    y_lim = extract_numbers_double( get_param(fname, "y_lim") );
+    z_lim = extract_numbers_double( get_param(fname, "z_lim") );
     
-        x_lim = extract_numbers_double( get_param(fname, "x_lim") );
-        y_lim = extract_numbers_double( get_param(fname, "y_lim") );
-        z_lim = extract_numbers_double( get_param(fname, "z_lim") );
-        
-        //convert angular limits from degree to radians
-        for(int i=0; i < 2 ;i++){
-            theta_lim[i] *= M_PI/180.;
-            phi_lim[i] *= M_PI/180.;
-        }
-
+    //convert angular limits from degree to radians
+    for(int i=0; i < 2 ;i++){
+        theta_lim[i] *= M_PI/180.;
+        phi_lim[i] *= M_PI/180.;
     }
-    
+
   
     // parameters for healpix sampling
     nside = std::stoi( get_param(fname, "nside") );
@@ -102,13 +97,18 @@ void parameters::read(std::string fname){
     
     //variable for generating random catalogue
     numb_rand = std::stoi( get_param(fname, "numb_rand") );
-    x_lim_rand = extract_numbers_double( get_param(fname, "x_lim_rand") );
-    y_lim_rand = extract_numbers_double( get_param(fname, "y_lim_rand") );
-    z_lim_rand = extract_numbers_double( get_param(fname, "z_lim_rand") );
-  
     make_rand = (get_param(fname, "make_rand") == "true");
     rand_seed = std::stod( get_param(fname, "rand_seed") );
     fname_rand = get_param(fname, "fname_rand");
+    
+    x_lim_rand = x_lim;
+    y_lim_rand = y_lim;
+    z_lim_rand = z_lim;
+    
+    r_lim_rand = r_lim;
+    theta_lim_rand = theta_lim;
+    phi_lim_rand = phi_lim;
+
 };
 
 
@@ -159,10 +159,25 @@ bool parameters::check(){
         eishockey = false;
     }
     
+    
     if(nrad < 1){
         std::cerr<<"# ##### ERROR: nrad must be > 0" << std::endl;
         eishockey = false;        
     }
+    
+    
+    if(!auto_limits){
+        if(theta_lim[0] < 0 || theta_lim[1] < 0 || theta_lim[0] > M_PI || theta_lim[1] > M_PI){
+            std::cerr<<"# ##### ERROR: theta_lim must be in range [0, 180] degree" << std::endl;
+            eishockey = false;        
+        }
+
+        if(r_lim[0] < 0 || r_lim[1] < 0){
+            std::cerr<<"# ##### ERROR: r_lim must be > 0" << std::endl;
+            eishockey = false;
+        }
+
+    }    
     
     //TODO:
     //check if limits are set correctly (min-max, not max, min) to avoid negative dr, dphi, dtheta
