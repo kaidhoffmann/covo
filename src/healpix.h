@@ -101,21 +101,6 @@ class healpix{
     };
     
     
-    
-    /*
-    
-    //! Returns the angular coordinates of the center of the pixel with number pix.
-     pointing pix2ang (I pix) const
-       {
-       double z, phi, sth;
-       bool have_sth;
-       pix2loc (pix,z,phi,sth,have_sth);
-       return have_sth ? pointing(atan2(sth,z),phi) : pointing(acos(z),phi);
-    }
-    
-    */
-
-
     public:
     
     

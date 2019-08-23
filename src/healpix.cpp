@@ -1,4 +1,4 @@
-//see
+//sources;
 //https://healpix.jpl.nasa.gov/html/cxxsupport/cxxutils_8h-source.html
 //https://healpix.jpl.nasa.gov/html/Healpix_cxx/healpix__base_8cc-source.html
 //https://healpix.jpl.nasa.gov/html/Healpix_cxx/healpix__base_8h-source.html
@@ -213,7 +213,7 @@ void healpix::pix2ang_z_phi_nest (int pix, double &z, double &phi) {
 }
 
 // ==========================================================
-//Returns the angular coordinates of the center of the pixel with number pix
+// Returns the angular coordinates of the center of the pixel with number pix
 // ==========================================================
 
 void healpix::pix2ang_nest (int pix, double &theta, double &phi){
@@ -224,7 +224,9 @@ void healpix::pix2ang_nest (int pix, double &theta, double &phi){
 
 
 // ==========================================================
-//
+// assign mask value to each pixel
+// true: pixel lies entirely with angular limits
+// false: pixel lies entirely or partly outside of angular limits
 // ==========================================================
 void healpix::make_mask(int nside, const std::vector <double> theta_lim, const std::vector <double> phi_lim){
     
@@ -253,10 +255,10 @@ void healpix::make_mask(int nside, const std::vector <double> theta_lim, const s
         
         
         // --- step two ---
-        //test of healpixels lie partly outside of range by
-        //looping over points on 4 border lines and mask the cells they hit
+        //test if healpixels lie partly outside of angular range by looping over points 
+        //on 4 angular border lines of mask and mark cells crossed by the line as false
         
-        int Nbin_ang = 10000;
+        int Nbin_ang = 10000;//number points on each line
 
         double dtheta = (theta_lim[1]-theta_lim[0]) / double(Nbin_ang);
         double dphi = (phi_lim[1]-phi_lim[0]) / double(Nbin_ang);
@@ -265,7 +267,7 @@ void healpix::make_mask(int nside, const std::vector <double> theta_lim, const s
         double toll_phi = (phi_lim[1]-phi_lim[0]) / 1000.;
 
         
-        // 1
+        // line 1
         for(int i=0; i<Nbin_ang; i++){
             phi = phi_lim[0] - dphi;
             theta = theta_lim[0] + i*dtheta;
@@ -274,8 +276,7 @@ void healpix::make_mask(int nside, const std::vector <double> theta_lim, const s
             }
         }
         
-        
-        // 2
+        // line 2
         for(int i=0; i<Nbin_ang; i++){
             phi = phi_lim[1] + dphi;
             theta = theta_lim[0] + i*dtheta;
@@ -283,8 +284,7 @@ void healpix::make_mask(int nside, const std::vector <double> theta_lim, const s
             if(ID==c.ID){c.masked = true;}
         }
         
-        
-        // 3
+        // line 3
         for(int i=0; i<Nbin_ang; i++){
             phi = phi_lim[0] + i*dphi;
             theta = theta_lim[0] - dtheta;
@@ -292,8 +292,7 @@ void healpix::make_mask(int nside, const std::vector <double> theta_lim, const s
             if(ID==c.ID){c.masked = true;}
         }
         
-        
-        // 4
+        // line 4
         for(int i=0; i<Nbin_ang; i++){
             phi = phi_lim[0] + i*dphi;
             theta = theta_lim[1] + dtheta;

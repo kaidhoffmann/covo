@@ -19,7 +19,7 @@
 
 
 // ==========================================================
-// normalize vectors in input catalogue (allow for interpretation of inner products in terms of angles)
+// normalize vectors in input catalogue
 // ==========================================================
 void catalogue::normalize_vectors(){
     
@@ -207,9 +207,9 @@ int catalogue::pos_to_ID_cart(
 // find mit min/max positions of sample
 // ==========================================================
 void catalogue::get_pos_limits(const parameters p){
-    if(p.auto_limits){
-        pos_limits_cart = find_limits_cart(input);
-        pos_limits_sphere = find_limits_sphere(input);
+    if(p.auto_limits && !p.make_rand){
+        if(p.mode == "box") pos_limits_cart = find_limits_cart(input);
+        if(p.mode == "shell") pos_limits_sphere = find_limits_sphere(input);
     }else{
         pos_limits_cart = {p.x_lim, p.y_lim, p.z_lim};
         pos_limits_sphere = {p.r_lim, p.theta_lim, p.phi_lim};
@@ -221,17 +221,21 @@ void catalogue::get_pos_limits(const parameters p){
 // ==========================================================
 // show mit min/max positions of sample
 // ==========================================================
-void catalogue::show_pos_limits(){
+void catalogue::show_pos_limits(const parameters p){
 
     double f = 180/M_PI;
     
-    std::cout <<"# "<< pos_limits_cart[0][0] <<" < x < "<< pos_limits_cart[0][1] <<std::endl;
-    std::cout <<"# "<< pos_limits_cart[1][0] <<" < y < "<< pos_limits_cart[1][1] <<std::endl;
-    std::cout <<"# "<< pos_limits_cart[2][0] <<" < z < "<< pos_limits_cart[2][1] <<std::endl;
-
-    std::cout <<"# "<< pos_limits_sphere[0][0] <<" < r < "<< pos_limits_sphere[0][1] <<std::endl;
-    std::cout <<"# "<< pos_limits_sphere[1][0]*f <<" < theta < "<< pos_limits_sphere[1][1]*f <<std::endl;
-    std::cout <<"# "<< pos_limits_sphere[2][0]*f <<" < phi < "<< pos_limits_sphere[2][1]*f <<std::endl;
+    if(p.mode == "box"){
+        std::cout <<"# "<< pos_limits_cart[0][0] <<" < x < "<< pos_limits_cart[0][1] <<std::endl;
+        std::cout <<"# "<< pos_limits_cart[1][0] <<" < y < "<< pos_limits_cart[1][1] <<std::endl;
+        std::cout <<"# "<< pos_limits_cart[2][0] <<" < z < "<< pos_limits_cart[2][1] <<std::endl;
+    }
+    
+    if(p.mode == "shell"){
+        std::cout <<"# "<< pos_limits_sphere[0][0] <<" < r < "<< pos_limits_sphere[0][1] <<std::endl;
+        std::cout <<"# "<< pos_limits_sphere[1][0]*f <<" < theta < "<< pos_limits_sphere[1][1]*f <<std::endl;
+        std::cout <<"# "<< pos_limits_sphere[2][0]*f <<" < phi < "<< pos_limits_sphere[2][1]*f <<std::endl;
+    }
 };
 
 
@@ -244,44 +248,44 @@ void cut_overlap(const parameters p, catalogue & cat_1, catalogue & cat_2){
     //get common minimi and maxima psitions in cat_1 and  cat_2
     for(int i=0; i<3; i++){
     
-        //minima in cartesian coordinates
-        if( cat_1.pos_limits_cart[i][0] < cat_2.pos_limits_cart[i][0] ){
-            cat_1.pos_limits_cart[i][0] = cat_2.pos_limits_cart[i][0];
-        }else{
-            cat_2.pos_limits_cart[i][0] = cat_1.pos_limits_cart[i][0];
-        }
+        if(p.mode == "box"){
 
-        //minima in cartesian coordinates
-        if( cat_1.pos_limits_cart[i][1] > cat_2.pos_limits_cart[i][1] ){
-            cat_1.pos_limits_cart[i][1] = cat_2.pos_limits_cart[i][1];
-        }else{
-            cat_2.pos_limits_cart[i][1] = cat_1.pos_limits_cart[i][1];
+            //minima in cartesian coordinates
+            if( cat_1.pos_limits_cart[i][0] < cat_2.pos_limits_cart[i][0] ){
+                cat_1.pos_limits_cart[i][0] = cat_2.pos_limits_cart[i][0];
+            }else{
+                cat_2.pos_limits_cart[i][0] = cat_1.pos_limits_cart[i][0];
+            }
+
+            //minima in cartesian coordinates
+            if( cat_1.pos_limits_cart[i][1] > cat_2.pos_limits_cart[i][1] ){
+                cat_1.pos_limits_cart[i][1] = cat_2.pos_limits_cart[i][1];
+            }else{
+                cat_2.pos_limits_cart[i][1] = cat_1.pos_limits_cart[i][1];
+            }
         }
         
-        //minima in spherical coordinates
-        if( cat_1.pos_limits_sphere[i][0] < cat_2.pos_limits_sphere[i][0] ){
-            cat_1.pos_limits_sphere[i][0] = cat_2.pos_limits_sphere[i][0];
-        }else{
-            cat_2.pos_limits_sphere[i][0] = cat_1.pos_limits_sphere[i][0];
-        }
+        if(p.mode == "shell"){
 
-        //spherical in spherical coordinates
-        if( cat_1.pos_limits_sphere[i][1] > cat_2.pos_limits_sphere[i][1] ){
-            cat_1.pos_limits_sphere[i][1] = cat_2.pos_limits_sphere[i][1];
-        }else{
-            cat_2.pos_limits_sphere[i][1] = cat_1.pos_limits_sphere[i][1];
+            //minima in spherical coordinates
+            if( cat_1.pos_limits_sphere[i][0] < cat_2.pos_limits_sphere[i][0] ){
+                cat_1.pos_limits_sphere[i][0] = cat_2.pos_limits_sphere[i][0];
+            }else{
+                cat_2.pos_limits_sphere[i][0] = cat_1.pos_limits_sphere[i][0];
+            }
+
+            //spherical in spherical coordinates
+            if( cat_1.pos_limits_sphere[i][1] > cat_2.pos_limits_sphere[i][1] ){
+                cat_1.pos_limits_sphere[i][1] = cat_2.pos_limits_sphere[i][1];
+            }else{
+                cat_2.pos_limits_sphere[i][1] = cat_1.pos_limits_sphere[i][1];
+            }
         }
         
     }
     
     cat_1.cut_input(p);
     cat_2.cut_input(p);
-    
-    //test with random catalogues in box
-    //test with random catalogues in sphere
-    //-> make spherical random
-    
-    
 };
 
 // ==========================================================
@@ -291,31 +295,36 @@ void catalogue::cut_input(const parameters p){
     
     for(int i=0; i<input.obj.size();i++){
         
-        std::vector < double > pos_cart = input.obj[i].pos;
-        std::vector < double > pos_sphere = cart_to_sphere(pos_cart);
-
         bool erase_object = false;
 
-        //if(p.mode == "box"){}
-        for(int j=0; j < pos_cart.size() && erase_object==false; j++){
-            if(
-                (pos_cart[j] <= pos_limits_cart[j][0]) ||
-                (pos_cart[j] >= pos_limits_cart[j][1])
-                ){
-                    erase_object = true;
-                }                
+        if(p.mode == "box"){
+            
+            std::vector < double > pos = input.obj[i].pos;
+
+            for(int j=0; j < pos.size() && erase_object==false; j++){
+                if(
+                    (pos[j] <= pos_limits_cart[j][0]) ||
+                    (pos[j] >= pos_limits_cart[j][1])
+                    ){
+                        erase_object = true;
+                    }                
+            }
         }
 
-        //if(p.mode == "shell"){}
-        for(int j=0; j < pos_sphere.size() && erase_object==false; j++){
-            if(
-                (pos_sphere[j] <= pos_limits_sphere[j][0]) ||
-                (pos_sphere[j] >= pos_limits_sphere[j][1])
-                ){
-                    erase_object = true;
-                }                
-        }
+        if(p.mode == "shell"){
+        
+            std::vector < double > pos = cart_to_sphere(input.obj[i].pos);
 
+            for(int j=0; j < pos.size() && erase_object==false; j++){
+                if(
+                    (pos[j] <= pos_limits_sphere[j][0]) ||
+                    (pos[j] >= pos_limits_sphere[j][1])
+                    ){
+                        erase_object = true;
+                    }                
+            }
+        }
+        
         if(erase_object){
             input.obj.erase(input.obj.begin()+i);
             i--;
@@ -330,7 +339,7 @@ void catalogue::cut_input(const parameters p){
 // - samples build using 3d grid mesh, spannig the the volume covered by the input catalogue
 // - should be used for data in box.
 // ==========================================================
-void catalogue::make_samples_cart(const parameters p){
+void catalogue::make_samples_box(const parameters p){
     
     //total number of samples
     int Nsamp=1;
@@ -372,16 +381,10 @@ void catalogue::make_samples_cart(const parameters p){
             for(int k = 0; k < p.numb_jk_cart[2]; k++){
 
                 std::vector <double> center = {
-                    (i+0.5)*Lcell[0]+(pos_limits[0][0]),
-                    (j+0.5)*Lcell[1]+(pos_limits[1][0]),
-                    (k+0.5)*Lcell[2]+(pos_limits[2][0])};
+                    (i+0.5)*Lcell[0] + pos_limits[0][0],
+                    (j+0.5)*Lcell[1] + pos_limits[1][0],
+                    (k+0.5)*Lcell[2] + pos_limits[2][0]};
 
-                /*wrong..
-                std::vector <double> center = {
-                    (i+0.5)*Lcell[0]-fabs(pos_limits[0][0]),
-                    (j+0.5)*Lcell[1]-fabs(pos_limits[1][0]),
-                    (k+0.5)*Lcell[2]-fabs(pos_limits[2][0])};*/
-                
                 int ID = pos_to_ID_cart(p.numb_jk_cart, center, pos_limits, Lcell);
                 
                 samp[ID].cent = center;
@@ -415,7 +418,7 @@ void catalogue::make_samples_cart(const parameters p){
 // - samples build using healpix mesh
 // - should be used for data in sphere.
 // ==========================================================
-void catalogue::make_samples_healpix(const parameters p){
+void catalogue::make_samples_shell(const parameters p){
     
     //limits of input cataloue in spherical coordinates r, theta, phi
     std::vector < std::vector < double > > pos_limits = pos_limits_sphere;
@@ -630,7 +633,7 @@ void catalogue::make_random_shell(const parameters p){
 
     int prcn=100000;
     
-    double r_vec = 1.0;
+    double r = 1.0;
     
     srand (p.rand_seed);
     
@@ -642,11 +645,10 @@ void catalogue::make_random_shell(const parameters p){
        
         std::vector <double> cos_theta_lim = {cos(p.theta_lim_rand[0]), cos(p.theta_lim_rand[1])};
         
-        
         //if(p.mode shell)
         obj_rand.pos = rand_vec_shell(intrsq_lim, cos_theta_lim, p.phi_lim_rand);
-        obj_rand.vec_a = rand_vec_sphere(r_vec);
-        obj_rand.vec_b = rand_vec_sphere(r_vec);
+        obj_rand.vec_a = rand_vec_sphere(r);
+        obj_rand.vec_b = rand_vec_sphere(r);
         
         random.obj.push_back(obj_rand);
     }
@@ -685,3 +687,20 @@ void catalogue::write_input(const parameters p, const std::string filename){
     }
     
 }
+
+
+
+// ==========================================================
+// get total number of objects in subsamples
+// ==========================================================
+int catalogue::numb_objects(){
+
+    int N = 0;
+    
+    for(int i=0; i<samp.size(); i++){
+        N += samp[i].obj.size();
+    }
+    
+    return N;
+}
+

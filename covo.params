@@ -1,37 +1,40 @@
 
-# input catalogues
+# set zero for silence
+verbose = 2
+
+
+# ==== input catalogues ====
 fname_cat_1 = ./catalogues/random_1.csv
 fname_cat_2 = ./catalogues/random_2.csv
 
 
-# variables for output filename
+# ==== variables for output filename ====
 # (set fname_out = auto to generate filename from prefix, suffix and extension)
 fname_out = auto
 fname_out_prefix = w
 fname_out_suffix = test
 fname_out_extention = csv
 
-
 dir_out = ./results/
 
 
-# delimiter for input catalogue and output file
-# (tab for "\t", space for " ", anything else will be used directly)
+# ==== delimiter for input catalogue and output file ====
+# ("tab" for "\t", "space" for " ", anything else will be used directly)
 delim_in = ,
 delim_out = space
 
 
-# add header to output file
+# ==== add header to output file ====
 header_out = true
 
 
-# columns for positions and vectors in input file
+# ==== columns for positions and vectors in input file ====
 cols_pos = 0,1,2
 cols_vec_a = 3,4,5
 cols_vec_b = 6,7,8
 
 
-# combinations for which to compute inner product correlations
+# ==== combinations for which to compute inner product correlations ====
 r12_v1a = true
 r12_v1b = true
 r12_v2a = true
@@ -42,28 +45,54 @@ v1a_v2b = true
 v1b_v2a = true
 
 
-# set zero for silence
-verbose = 2
-
-
-# jack-knife samples per axis
-numb_jk  = 4,4,4
-
-
-# binning
+# ==== binning ====
 r_min = 0.1
-r_max = 20
-numb_bin = 10
+r_max = 100
+numb_bin = 20
 lg_bins = true
 
+# exponent for inner product
+expip = 2
 
-# random catalogue
 
+# ==== operational mode ====
+# box: errors are derived from rectangular subsamples, random is build in box
+# shell: errors are derived from healpix subsamples with radial bins, random is build on shell
+mode = shell
+
+
+# ==== jack-knifing ====
+# cartesian subsamples (used when mode = box)
+# split volume into (nx,ny,nz) pieces along each axis => nx*ny*nz samples in total
+numb_jk_cart  = 4,4,4
+
+# subsamples on shell (used when mode = shell)
+# nside sets number of healpix samples on sphere (must be power of 2)
+# nrad = number of radial bins
+nside = 4
+nrad = 3
+
+
+# ==== min/max positions in catalogue =====
+# cartesian coordinates (used when mode = box)
+x_lim = 0,200
+y_lim = 0,200
+z_lim = 0,200
+
+# spherical coordinates (used when mode = shell)
+r_lim = 200, 250
+theta_lim = 0, 110
+phi_lim = 0, 120
+
+# ignore limits above and extract them from input catalogues
+auto_limits = true
+
+
+# ==== random catalogue ====
+#make_rand = true: make random catalogue and use it instead of input catalogue 
 make_rand = false
-rand_seed = 999
+rand_seed = 123
 fname_rand = ./catalogues/random_1.csv
 
+# number of random points
 numb_rand = 10000
-xlim_rand = 0,100
-ylim_rand = 0,100
-zlim_rand = 0,100

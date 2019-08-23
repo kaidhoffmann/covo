@@ -32,8 +32,8 @@ class parameters{
     
     bool auto_limits;
     
-    std::string type_subsample;
-
+    std::string mode;
+    
     double nside, nrad;
     
     std::vector <int> numb_jk_cart;
@@ -48,6 +48,8 @@ class parameters{
     int numb_bin;
     
     bool lg_bins;
+    
+    double expip;
     
     bool
     r12_v1a, r12_v1b,

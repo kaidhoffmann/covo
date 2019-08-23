@@ -59,14 +59,16 @@ int main(int argc, char **argv){
     //===============================
     // set up input catalogues
     //===============================
+    
     catalogue cat_1;
     catalogue cat_2;
     
     if(p.make_rand){
         if(p.verbose > 1) std::cout<<std::endl<<"# ==== make random catalogue ====" << std::endl;
         
-        //cat_1.make_random_box (p);
-        cat_1.make_random_shell (p);
+        if(p.mode == "box") cat_1.make_random_box (p);
+        if(p.mode == "shell") cat_1.make_random_shell (p);
+
         cat_1.input = cat_1.random;
         cat_1.write_input(p, p.fname_rand);
         cat_2.input = cat_1.input;
@@ -98,30 +100,22 @@ int main(int argc, char **argv){
     cat_1.get_pos_limits(p);
     cat_2.get_pos_limits(p);
     
-    if(p.verbose>0){
-        std::cout<<"\n# min. / max. position in catalogue 1"<<std::endl;
-        cat_1.show_pos_limits();
+    if(p.verbose>0 && p.auto_limits && !p.make_rand){
+        std::cout<<"\n# min. / max. coordinates in catalogue 1"<<std::endl;
+        cat_1.show_pos_limits(p);
         std::cout<<std::endl;
 
-        std::cout<<"# min. / max. position in catalogue 2"<<std::endl;
-        cat_2.show_pos_limits();
-        std::cout<<std::endl;
+        if(p.fname_cat_1!=p.fname_cat_2){
+            std::cout<<"# min. / max. coordinates in catalogue 2"<<std::endl;
+            cat_2.show_pos_limits(p);
+            std::cout<<std::endl;
+        }
     }
-
     
-    //find overlap region between catalogs
-    cut_overlap(p, cat_1, cat_2);
-
-    
-    //print again, just for testing
-    if(p.verbose>0){
-        std::cout<<"\n# min. / max. position in catalogue 1"<<std::endl;
-        cat_1.show_pos_limits();
-        std::cout<<std::endl;
-
-        std::cout<<"# min. / max. position in catalogue 2"<<std::endl;
-        cat_2.show_pos_limits();
-        std::cout<<std::endl;
+    //cut out overlap region between catalogs
+    if(p.fname_cat_1 != p.fname_cat_2 && p.auto_limits && !p.make_rand){
+        if(p.verbose > 1) std::cout<<"# cut out overlap region between catalog 1 and catalog 2\n" <<std::endl;
+        cut_overlap(p, cat_1, cat_2);
     }
     
     
@@ -129,31 +123,40 @@ int main(int argc, char **argv){
     cat_1.normalize_vectors();
     cat_2.normalize_vectors();
     
+    
     //make jack-knife samples
-    if(p.type_subsample=="healpix"){
-        cat_1.make_samples_healpix(p);
-        cat_2.make_samples_healpix(p);
+    if(p.verbose>1) std::cout<<"# make subsamples" <<std::endl;
         
-    }else{
-        cat_1.make_samples_cart(p);
-        cat_2.make_samples_cart(p);
+    if(p.mode=="shell"){
+        cat_1.make_samples_shell(p);
+        cat_2.make_samples_shell(p);
+        
+    }
+    if(p.mode=="box"){
+        cat_1.make_samples_box(p);
+        cat_2.make_samples_box(p);
+    }
+    if(cat_1.samp.size() != cat_2.samp.size()){
+        std::cerr << "#### ERROR: different subsamples in cat 1 and cat 2 ####" << std::endl;
+        exit (EXIT_FAILURE);        
     }
     
-    for(int i=0; i < cat_1.samp.size(); i++){
-        for(int j=0; j < cat_1.samp[i].obj.size(); j++){
-
-            std::cout
-                << cat_1.samp[i].obj[j].pos[0] <<","
-                << cat_1.samp[i].obj[j].pos[1] <<","
-                << cat_1.samp[i].obj[j].pos[2] <<","
-                << i << std::endl;
-        }
-    }
     
     //delete original input catalogue to free memory
     cat_1.delete_input();
     cat_2.delete_input();
     
+    if(p.verbose>1){
+        std::cout<<"# number of subsamples: "<< cat_1.samp.size() <<std::endl;
+
+        std::cout<<"# total number of objects in sub samples "<<std::endl;
+        std::cout<<"# cat1: " << cat_1.numb_objects()<<", cat2: " << cat_2.numb_objects()<<std::endl;
+        
+        std::cout<<"# mean number of objects per sub sample "<<std::endl;
+        std::cout<<"# cat1: " << double(cat_1.numb_objects()) / double(cat_1.samp.size())
+        <<", cat2: " << double(cat_2.numb_objects()) / double(cat_2.samp.size())<<"\n"<<std::endl;
+        
+    }
     
     //===============================
     if(p.verbose > 1) std::cout<<std::endl<<"# ==== compute correlation ==== " << std::endl;

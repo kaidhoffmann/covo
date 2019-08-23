@@ -45,12 +45,11 @@ class catalogue{
     
     void get_pos_limits(const parameters p);
 
-    void show_pos_limits();
+    void show_pos_limits(const parameters p);
 
     void cut_input(const parameters p);
     
     std::vector < std::vector < double > > pos_limits_cart, pos_limits_sphere;
-    
     
     std::vector < sample > samp;
     
@@ -62,9 +61,9 @@ class catalogue{
     
     void normalize_vectors();
    
-    void make_samples_cart(const parameters p);
+    void make_samples_box(const parameters p);
 
-    void make_samples_healpix(const parameters p);
+    void make_samples_shell(const parameters p);
     
     void delete_input();
 
@@ -73,6 +72,8 @@ class catalogue{
     void make_random_shell(const parameters p);
 
     void write_input(const parameters p, const std::string filename);
+    
+    int numb_objects();
 
 };
 

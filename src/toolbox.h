@@ -111,6 +111,20 @@ template <typename T> inline std::vector<T> cart_to_sphere(const std::vector<T> 
 }
 
 
+// ==========================================================
+// check if x is power of y
+// source: https://www.geeksforgeeks.org/check-if-a-number-is-power-of-another-number/
+// ==========================================================
+template <typename Ta, typename Tb > inline bool isPower(Ta x, Tb y){
+    
+    // logarithm function to calculate value 
+    int res1 = int(log(y) / log(x)); 
+    double res2 = double(log(y) / log(x)); // Note : this is double 
+  
+    // compare to the result1 or result2 both are equal 
+    return (res1 == res2); 
+} 
+
 
 
 #endif // TOOLBOX_H

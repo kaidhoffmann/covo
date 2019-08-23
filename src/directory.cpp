@@ -15,9 +15,9 @@
 
 //===========================================================
 // check if directory exists
-//===========================================================
 //from https://stackoverflow.com/questions/4980815/c-determining-if-directory-not-a-file-exists-in-linux
 // note: function rquires <string.h> or <cstring>, not <string>
+//===========================================================
 bool directory_exists(const short verbose, const std::string pathname)
 {
     bool dir_ex = false;
@@ -39,8 +39,8 @@ bool directory_exists(const short verbose, const std::string pathname)
 
 //===========================================================
 // make directory
-//===========================================================
 //from https://codeyarns.com/2014/08/07/how-to-create-directory-using-c-on-linux/
+//===========================================================
 void make_directory(const short verbose, const std::string pathname){
     
     if(verbose>2) std::cout<<"##### [io_data: make_directory]: make "<< pathname << " #####" << std::endl;

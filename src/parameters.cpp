@@ -11,6 +11,8 @@
 #include <vector>
 #include <cmath>
 #include "parameters.h"
+#include "toolbox.h"
+
 
 
 
@@ -49,8 +51,8 @@ void parameters::read(std::string fname){
     cols_vec_b = extract_numbers_int( get_param(fname, "cols_vec_b") );
     
     auto_limits = (get_param(fname, "auto_limits") == "true");
-    
-    type_subsample = get_param(fname, "type_subsample");
+        
+    mode = get_param(fname, "mode");
   
     r_lim = extract_numbers_double( get_param(fname, "r_lim") );
     theta_lim = extract_numbers_double( get_param(fname, "theta_lim") );
@@ -80,6 +82,8 @@ void parameters::read(std::string fname){
     r_max = std::stod( get_param(fname, "r_max") );
     lg_bins = (get_param(fname, "lg_bins") == "true");
 
+    // exponent for inner product
+    expip = std::stod( get_param(fname, "expip") );
   
     //vector cobinations to compute
     r12_v1a = (get_param(fname, "r12_v1a") == "true");
@@ -147,15 +151,18 @@ bool parameters::check(){
         eishockey = false;        
     }
     
-    if(type_subsample !="cartesian" && type_subsample !="healpix"){
-        std::cerr<<"# ##### ERROR: type_subsample must be cartesian or healpix" << std::endl;
+    if( mode != "box" && mode != "shell"){
+        std::cerr<<"# ##### ERROR: mode must be box or shell " << std::endl;
         eishockey = false;        
     }
     
-    
     if(nside < 1){
-        //TODO: check order
-        std::cerr<<"# ##### ERROR: nside must be power of 2 and > 0" << std::endl;
+        std::cerr<<"# ##### ERROR: nside must be > 0" << std::endl;
+        eishockey = false;
+    }
+    
+    if(!isPower(2,nside)){
+        std::cerr<<"# ##### ERROR: nside must be power of 2" << std::endl;
         eishockey = false;
     }
     
@@ -176,11 +183,35 @@ bool parameters::check(){
             std::cerr<<"# ##### ERROR: r_lim must be > 0" << std::endl;
             eishockey = false;
         }
-
-    }    
+        
+        if(x_lim[0] > x_lim[1]){
+            std::cerr<<"# ##### ERROR: x_min > x_max" << std::endl;
+            eishockey = false;
+        }
+        if(y_lim[0] > y_lim[1]){
+            std::cerr<<"# ##### ERROR: y_min > y_max" << std::endl;
+            eishockey = false;
+        }
+        if(z_lim[0] > z_lim[1]){
+            std::cerr<<"# ##### ERROR: z_min > z_max" << std::endl;
+            eishockey = false;
+        }
+        
+        if(r_lim[0] > r_lim[1]){
+            std::cerr<<"# ##### ERROR: r_min > r_max" << std::endl;
+            eishockey = false;
+        }
+        if(theta_lim[0] > theta_lim[1]){
+            std::cerr<<"# ##### ERROR: theta_min > theta_max" << std::endl;
+            eishockey = false;
+        }
+        if(phi_lim[0] > phi_lim[1]){
+            std::cerr<<"# ##### ERROR: phi_min > phi_max" << std::endl;
+            eishockey = false;
+        }
+        
+    }
     
-    //TODO:
-    //check if limits are set correctly (min-max, not max, min) to avoid negative dr, dphi, dtheta
     
     std::cout<<std::endl;
 
@@ -216,15 +247,15 @@ void parameters::print(){
     
     int Njk=1;
     for(int i = 0; i < numb_jk_cart.size(); i++){ Njk *= numb_jk_cart[i]; }
-    
-    std::cout << "# type_subsample: ";
-    std::cout << type_subsample << std::endl;
        
+    std::cout << "# mode: ";
+    std::cout << mode << std::endl;
+
     std::cout << "# auto_limits: " << auto_limits << std::endl;
 
-    if(type_subsample=="cartesian"){
+    if(mode=="box"){
 
-        if(!auto_limits){
+        if(!auto_limits || make_rand){
             
             std::cout<<"# x_lim: ";
             for(int i = 0; i < x_lim.size(); i++){ std::cout<<x_lim[i]<<" "; }
@@ -246,9 +277,9 @@ void parameters::print(){
     }
     
     
-    if(type_subsample=="healpix"){
+    if(mode=="shell"){
         
-        if(!auto_limits){
+        if(!auto_limits || make_rand){
             
             std::cout<<"# r_lim: ";
             for(int i = 0; i < r_lim.size(); i++){ std::cout<<r_lim[i]<<" "; }
@@ -291,6 +322,8 @@ void parameters::print(){
     std::cout<<"# lg_bins = "<<lg_bins<<std::endl;
     std::cout<<std::endl;
     
+    std::cout<<"# expip = "<<expip<<std::endl;
+    std::cout<<std::endl;
     
     std::cout<<"# r12_v1a = "<<r12_v1a<<std::endl;
     std::cout<<"# r12_v1b = "<<r12_v1b<<std::endl;
@@ -312,19 +345,6 @@ void parameters::print(){
         std::cout<<"# fname_rand = "<<fname_rand<<std::endl;
         
         std::cout<<"# numb_rand = "<<numb_rand<<std::endl;
-        
-        std::cout<<"# x_lim_rand: ";
-        for(int i = 0; i < x_lim_rand.size(); i++){ std::cout<<x_lim_rand[i]<<" "; }
-        std::cout<<std::endl;
-
-        std::cout<<"# y_lim_rand: ";
-        for(int i = 0; i < y_lim_rand.size(); i++){ std::cout<<y_lim_rand[i]<<" "; }
-        std::cout<<std::endl;
-
-        std::cout<<"# z_lim_rand: ";
-        for(int i = 0; i < z_lim_rand.size(); i++){ std::cout<<z_lim_rand[i]<<" "; }
-        std::cout<<std::endl;
-
     }
     
     std::cout << "# ============================================" << std::endl;
@@ -354,7 +374,6 @@ std::string parameters::get_param(std::string fname_param_file, std::string para
             auto delimiterPos = line.find("=");
             auto var = line.substr(0, delimiterPos);
             auto val = line.substr(delimiterPos + 1);
-            //std::cout << var << " = " << val << std::endl;
             
             if(param_name == var){
                 param = val;
@@ -381,9 +400,9 @@ std::string parameters::get_param(std::string fname_param_file, std::string para
 
 //===========================================================
 // get vector with int numbers from string
+// from https://stackoverflow.com/questions/41820639/c-extracting-the-integer-in-a-string-with-multiple-delimiters
 //===========================================================
 std::vector<int> parameters::extract_numbers_int(std::string str){
-//from https://stackoverflow.com/questions/41820639/c-extracting-the-integer-in-a-string-with-multiple-delimiters
 
     std::vector<int> numbers;
     std::stringstream ss(str);
@@ -404,9 +423,9 @@ std::vector<int> parameters::extract_numbers_int(std::string str){
 
 //===========================================================
 // get vector with double numbers from string
+// from https://stackoverflow.com/questions/41820639/c-extracting-the-integer-in-a-string-with-multiple-delimiters
 //===========================================================
 std::vector<double> parameters::extract_numbers_double(std::string str){
-//from https://stackoverflow.com/questions/41820639/c-extracting-the-integer-in-a-string-with-multiple-delimiters
 
     std::vector<double> numbers;
     std::stringstream ss(str);
