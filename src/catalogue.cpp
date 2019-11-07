@@ -257,7 +257,7 @@ void cut_overlap(const parameters p, catalogue & cat_1, catalogue & cat_2){
                 cat_2.pos_limits_cart[i][0] = cat_1.pos_limits_cart[i][0];
             }
 
-            //minima in cartesian coordinates
+            //maxima in cartesian coordinates
             if( cat_1.pos_limits_cart[i][1] > cat_2.pos_limits_cart[i][1] ){
                 cat_1.pos_limits_cart[i][1] = cat_2.pos_limits_cart[i][1];
             }else{
@@ -274,7 +274,7 @@ void cut_overlap(const parameters p, catalogue & cat_1, catalogue & cat_2){
                 cat_2.pos_limits_sphere[i][0] = cat_1.pos_limits_sphere[i][0];
             }
 
-            //spherical in spherical coordinates
+            //maxima in spherical coordinates
             if( cat_1.pos_limits_sphere[i][1] > cat_2.pos_limits_sphere[i][1] ){
                 cat_1.pos_limits_sphere[i][1] = cat_2.pos_limits_sphere[i][1];
             }else{

@@ -252,9 +252,10 @@ void parameters::print(){
        
     std::cout << "# mode: " << mode << std::endl;
     std::cout << "# auto_limits: " << auto_limits << std::endl;
-    std::cout << "# periodic_box: " << periodic_box << std::endl;
-
+    
     if(mode=="box"){
+
+        std::cout << "# periodic_box: " << periodic_box << std::endl;
 
         if(!auto_limits || make_rand){
             

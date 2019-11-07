@@ -58,7 +58,7 @@ expip = 2
 # ==== operational mode ====
 # box: errors are derived from rectangular subsamples, random is build in box
 # shell: errors are derived from healpix subsamples with radial bins, random is build on shell
-mode = shell
+mode = box
 
 # ==== periodic boundaries ====
 # take periodic boundaries into account if mode=box
@@ -93,7 +93,7 @@ auto_limits = true
 
 # ==== random catalogue ====
 #make_rand = true: make random catalogue and use it instead of input catalogue 
-make_rand = false
+make_rand = true
 rand_seed = 123
 fname_rand = ./catalogues/random_1.csv
 
