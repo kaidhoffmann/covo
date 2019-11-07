@@ -14,7 +14,6 @@
 #include "catalogue.h"
 #include "correlation.h"
 
-
 int main(int argc, char **argv){
     
 
@@ -112,9 +111,23 @@ int main(int argc, char **argv){
         }
     }
     
+
+    //check differences in volume limits between catalogue 1 and 2
+    double diff_toll = 0.01; //tollerance in relative difference between box limits [%]
+    bool lim_diff = vol_lim_diff(p, cat_1, cat_2, diff_toll);
+    if(lim_diff){
+        if(p.verbose > 0) std::cout<< "#### WARINING: >" << diff_toll*100 <<" % difference in box limits of catalog 1 and catalog 2" << std::endl;
+
+        if(p.periodic_box && p.mode=="box" && p.auto_limits){
+            if(p.verbose > 0) std::cout<< " -> set periodic_box = false" << std::endl;
+            p.periodic_box=false;
+        }
+    }
+
+
     //cut out overlap region between catalogs
     if(p.fname_cat_1 != p.fname_cat_2 && p.auto_limits && !p.make_rand){
-        if(p.verbose > 1) std::cout<<"# cut out overlap region between catalog 1 and catalog 2\n" <<std::endl;
+        if(p.verbose > 1) std::cout<<"# cut out overlap region between cat 1 and cat 2\n" <<std::endl;
         cut_overlap(p, cat_1, cat_2);
     }
     

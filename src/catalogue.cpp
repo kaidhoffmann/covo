@@ -40,6 +40,7 @@ void catalogue::normalize_vectors(){
 
 
 
+
 // ==========================================================
 // read catalogue from ascii file
 // ==========================================================
@@ -241,12 +242,39 @@ void catalogue::show_pos_limits(const parameters p){
 
 
 // ==========================================================
-// cut overla region between two input catalogues
+// check differences in position limits between catalogs 
+// ==========================================================
+bool vol_lim_diff(const parameters p, const catalogue & cat_1, const catalogue & cat_2, double diff_toll){
+
+    bool lim_diff = false;
+
+    int dim = cat_1.input.obj[0].pos.size();
+    
+    for(int i=0; i<dim; i++){
+        
+        double L1 = (cat_1.pos_limits_cart[i][1] - cat_1.pos_limits_cart[i][0]);
+        double L2 = (cat_2.pos_limits_cart[i][1] - cat_2.pos_limits_cart[i][0]);
+        double D = fabs(cat_1.pos_limits_cart[i][0] - cat_2.pos_limits_cart[i][0]);            
+        double diff_1 = D / L1;
+        double diff_2 = D / L2;
+
+        if(diff_1 > diff_toll || diff_2 > diff_toll){ lim_diff = true; }
+    }
+    
+    return lim_diff;
+}
+
+
+// ==========================================================
+// cut overlap region between two input catalogues
 // ==========================================================
 void cut_overlap(const parameters p, catalogue & cat_1, catalogue & cat_2){
     
-    //get common minimi and maxima psitions in cat_1 and  cat_2
-    for(int i=0; i<3; i++){
+    //get common minimi and maxima positions in cat_1 and  cat_2
+    
+    int dim = cat_1.input.obj[0].pos.size();
+    
+    for(int i=0; i<dim; i++){
     
         if(p.mode == "box"){
 

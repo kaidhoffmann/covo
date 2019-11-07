@@ -78,6 +78,8 @@ class catalogue{
 };
 
 
+bool vol_lim_diff(const parameters p, const catalogue & cat_1, const catalogue & cat_2, double diff_toll);
+
 void cut_overlap(const parameters p, catalogue & cat_1, catalogue & cat_2);
 
 
