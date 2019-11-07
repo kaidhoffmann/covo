@@ -60,6 +60,9 @@ expip = 2
 # shell: errors are derived from healpix subsamples with radial bins, random is build on shell
 mode = shell
 
+# ==== periodic boundaries ====
+# take periodic boundaries into account when searching for pairs
+periodic_box = true
 
 # ==== jack-knifing ====
 # cartesian subsamples (used when mode = box)
