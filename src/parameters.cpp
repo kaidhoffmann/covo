@@ -53,6 +53,8 @@ void parameters::read(std::string fname){
     auto_limits = (get_param(fname, "auto_limits") == "true");
         
     mode = get_param(fname, "mode");
+    
+    periodic_box = (get_param(fname, "periodic_box") == "true");
   
     r_lim = extract_numbers_double( get_param(fname, "r_lim") );
     theta_lim = extract_numbers_double( get_param(fname, "theta_lim") );
@@ -248,10 +250,9 @@ void parameters::print(){
     int Njk=1;
     for(int i = 0; i < numb_jk_cart.size(); i++){ Njk *= numb_jk_cart[i]; }
        
-    std::cout << "# mode: ";
-    std::cout << mode << std::endl;
-
+    std::cout << "# mode: " << mode << std::endl;
     std::cout << "# auto_limits: " << auto_limits << std::endl;
+    std::cout << "# periodic_box: " << periodic_box << std::endl;
 
     if(mode=="box"){
 

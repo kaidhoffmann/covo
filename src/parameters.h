@@ -34,6 +34,8 @@ class parameters{
     
     std::string mode;
     
+    bool periodic_box;
+
     double nside, nrad;
     
     std::vector <int> numb_jk_cart;

@@ -61,7 +61,7 @@ expip = 2
 mode = shell
 
 # ==== periodic boundaries ====
-# take periodic boundaries into account when searching for pairs
+# take periodic boundaries into account if mode=box
 periodic_box = true
 
 # ==== jack-knifing ====
