@@ -93,14 +93,15 @@ correlation::vars correlation::sums_pairs(
             
             float d[3]={0};
             
-            d[0] = obj_1[i].pos[0] - obj_2[j].pos[0];
+            //set fabs to distance components in correlation::sums_pairs
             
+            d[0] = fabs(obj_1[i].pos[0] - obj_2[j].pos[0]);
             if(d[0]<p.r_max){
                 
-                d[1] = obj_1[i].pos[1] - obj_2[j].pos[1];
+                d[1] = fabs(obj_1[i].pos[1] - obj_2[j].pos[1]);
                 if(d[1]<p.r_max){
                 
-                    d[2] = obj_1[i].pos[2] - obj_2[j].pos[2];
+                    d[2] = fabs(obj_1[i].pos[2] - obj_2[j].pos[2]);
                     if(d[2]<p.r_max){
                         
                         float r_sq_01 = d[0]*d[0] + d[1]*d[1];
