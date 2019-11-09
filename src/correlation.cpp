@@ -87,6 +87,17 @@ correlation::vars correlation::sums_pairs(
     if(p.v1b_v2a){sums_samp.v1b_v2a.resize(p.numb_bin,0.0);}
 
     
+    //box size
+    float Lbox[3]={0};
+    if(p.mode=="box"){
+        Lbox[0] = p.x_lim[1] - p.x_lim[1];
+        Lbox[1] = p.y_lim[1] - p.y_lim[1];
+        Lbox[2] = p.z_lim[1] - p.z_lim[1];
+    }
+    
+    float r_max = float(p.r_max);
+    bool periodic = false;
+    if(p.mode=="box" && p.periodic_box) periodic = true;
     
     for(int i=0; i < obj_1.size(); i++){
         for(int j=0; j < obj_2.size(); j++){
@@ -94,15 +105,20 @@ correlation::vars correlation::sums_pairs(
             float d[3]={0};
             
             //set fabs to distance components in correlation::sums_pairs
+            d[0] = obj_1[i].pos[0] - obj_2[j].pos[0];
+            if(periodic){ periodic_distance(d[0], Lbox[0], r_max); }
             
-            d[0] = fabs(obj_1[i].pos[0] - obj_2[j].pos[0]);
-            if(d[0]<p.r_max){
+            if(fabs(d[0]) < r_max){
                 
                 d[1] = fabs(obj_1[i].pos[1] - obj_2[j].pos[1]);
-                if(d[1]<p.r_max){
+                if(periodic){ periodic_distance(d[1], Lbox[1], r_max); }
+
+                if(fabs(d[1]) < r_max){
                 
                     d[2] = fabs(obj_1[i].pos[2] - obj_2[j].pos[2]);
-                    if(d[2]<p.r_max){
+                    if(periodic){ periodic_distance(d[2], Lbox[2], r_max); }
+                    
+                    if(fabs(d[2]) < r_max){
                         
                         float r_sq_01 = d[0]*d[0] + d[1]*d[1];
                         if(r_sq_01<r_max_sq){                    
@@ -127,7 +143,6 @@ correlation::vars correlation::sums_pairs(
                                             }else{
                                                 bin = (r_abs - p.r_min) / dr;
                                             }
-                                            
                                             
                                             std::vector < double > r_vec;
                                             

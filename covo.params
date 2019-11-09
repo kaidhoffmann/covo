@@ -88,12 +88,12 @@ theta_lim = 0, 110
 phi_lim = 0, 120
 
 # ignore limits above and extract them from input catalogues
-auto_limits = true
+auto_limits = false
 
 
 # ==== random catalogue ====
 #make_rand = true: make random catalogue and use it instead of input catalogue 
-make_rand = true
+make_rand = false
 rand_seed = 123
 fname_rand = ./catalogues/random_1.csv
 

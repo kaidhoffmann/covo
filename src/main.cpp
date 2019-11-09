@@ -111,6 +111,12 @@ int main(int argc, char **argv){
         }
     }
     
+    //cut out catalogs at limits defined in parameter file
+    if(p.mode=="box" && !p.auto_limits){
+        cat_1.cut_input(p);
+        cat_2.cut_input(p);
+    }
+
 
     //check differences in volume limits between catalogue 1 and 2
     double diff_toll = 0.01; //tollerance in relative difference between box limits [%]
@@ -126,9 +132,17 @@ int main(int argc, char **argv){
 
 
     //cut out overlap region between catalogs
-    if(p.fname_cat_1 != p.fname_cat_2 && p.auto_limits && !p.make_rand){
+    if(p.auto_limits && !p.make_rand && p.fname_cat_1 != p.fname_cat_2){
         if(p.verbose > 1) std::cout<<"# cut out overlap region between cat 1 and cat 2\n" <<std::endl;
         cut_overlap(p, cat_1, cat_2);
+    }
+    
+    
+    //set box limit parameters to actual values determined above
+    if(p.mode=="box" && !p.make_rand){
+        p.x_lim = cat_1.pos_limits_cart[0];
+        p.y_lim = cat_1.pos_limits_cart[1];
+        p.z_lim = cat_1.pos_limits_cart[2];
     }
     
     
