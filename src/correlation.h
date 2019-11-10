@@ -40,6 +40,7 @@ class correlation{
 
     
     double min_samp_dist(
+        const parameters p,
         const std::vector < std::vector < double > > & edge_1,
         const std::vector < std::vector < double > > & edge_2);
     

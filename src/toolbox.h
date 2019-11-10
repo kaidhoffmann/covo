@@ -82,14 +82,15 @@ template <typename T> inline double distance(const std::vector <T> & pos_1,  con
 // ==========================================================
 // 1D distance in periodic box
 // ==========================================================
-template <typename T> inline void periodic_distance(T dr, T Lbox, T r_max){
+template <typename T> inline T periodic_distance(T dr, T Lbox, T r_max){
     if(dr >= r_max){
         dr -= Lbox;
     }else{
-        if(dr <= r_max){
+        if(dr <= -r_max){
             dr += Lbox;
         }
     }
+    return dr;
 }
 
 

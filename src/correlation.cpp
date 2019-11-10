@@ -22,18 +22,47 @@
 // mimimal distance between two samples defined by their edges
 // ==========================================================
 double correlation::min_samp_dist(
+    const parameters p,
     const std::vector < std::vector < double > > & edge_1,
     const std::vector < std::vector < double > > & edge_2){
     
-    double dist_min = 0;
+    double r_max = float(p.r_max);
+    bool periodic = false;
     
-    //initialize
-    if(edge_1.size()>0 && edge_2.size()>0) distance(edge_1[0], edge_2[0]);
+    if(p.mode=="box" && p.periodic_box) periodic = true;
+   
+    int dim = edge_1[0].size();
+    
+    double Lbox[dim]={0};
+    if(p.mode=="box"){
+        Lbox[0] = p.x_lim[1] - p.x_lim[0];
+        Lbox[1] = p.y_lim[1] - p.y_lim[0];
+        Lbox[2] = p.z_lim[1] - p.z_lim[0];
+    }
+
+
+    
+    double dist_min = 0;
+    for(int k=0; k<dim; k++){
+        double dk = edge_1[0][k] - edge_2[0][k];
+        double dk_prev = dk;
+        if(periodic){ dk = periodic_distance(dk, Lbox[k], r_max); }
+        dist_min += dk*dk;
+    }
+    dist_min = pow(dist_min,0.5);
+
+    
     
     for(int i=0; i < edge_1.size(); i++){
         for(int j=0; j < edge_2.size(); j++){
-        
-            double dist = distance(edge_1[i], edge_2[j]);
+            
+            double dist = 0;
+            for(int k=0; k<dim; k++){
+                double dk = edge_1[i][k] - edge_2[j][k];
+                if(periodic){ dk = periodic_distance(dk, Lbox[k], r_max); }
+                dist += dk*dk;                    
+            }
+            dist = pow(dist,0.5);
             
             if(dist < dist_min){ dist_min = dist; }
             
@@ -55,6 +84,7 @@ correlation::vars correlation::sums_pairs(
     const std::vector < catalogue::object > & obj_2){
     
     double dr = (p.r_max - p.r_min) / double(p.numb_bin);
+    double r_max = float(p.r_max);
     double r_min_sq = pow(p.r_min,2);
     double r_max_sq = pow(p.r_max,2);
     double lg_r_min = log10(p.r_min);
@@ -88,35 +118,33 @@ correlation::vars correlation::sums_pairs(
 
     
     //box size
-    float Lbox[3]={0};
+    double Lbox[3]={0};
     if(p.mode=="box"){
-        Lbox[0] = p.x_lim[1] - p.x_lim[1];
-        Lbox[1] = p.y_lim[1] - p.y_lim[1];
-        Lbox[2] = p.z_lim[1] - p.z_lim[1];
+        Lbox[0] = p.x_lim[1] - p.x_lim[0];
+        Lbox[1] = p.y_lim[1] - p.y_lim[0];
+        Lbox[2] = p.z_lim[1] - p.z_lim[0];
     }
     
-    float r_max = float(p.r_max);
     bool periodic = false;
     if(p.mode=="box" && p.periodic_box) periodic = true;
     
     for(int i=0; i < obj_1.size(); i++){
         for(int j=0; j < obj_2.size(); j++){
             
-            float d[3]={0};
+            double d[3]={0};
             
-            //set fabs to distance components in correlation::sums_pairs
             d[0] = obj_1[i].pos[0] - obj_2[j].pos[0];
-            if(periodic){ periodic_distance(d[0], Lbox[0], r_max); }
+            if(periodic){ d[0] = periodic_distance(d[0], Lbox[0], r_max); }
             
             if(fabs(d[0]) < r_max){
                 
-                d[1] = fabs(obj_1[i].pos[1] - obj_2[j].pos[1]);
-                if(periodic){ periodic_distance(d[1], Lbox[1], r_max); }
+                d[1] = obj_1[i].pos[1] - obj_2[j].pos[1];
+                if(periodic){ d[1] = periodic_distance(d[1], Lbox[1], r_max); }
 
                 if(fabs(d[1]) < r_max){
                 
-                    d[2] = fabs(obj_1[i].pos[2] - obj_2[j].pos[2]);
-                    if(periodic){ periodic_distance(d[2], Lbox[2], r_max); }
+                    d[2] = obj_1[i].pos[2] - obj_2[j].pos[2];
+                    if(periodic){ d[2] = periodic_distance(d[2], Lbox[2], r_max); }
                     
                     if(fabs(d[2]) < r_max){
                         
@@ -237,7 +265,7 @@ void correlation::sums_for_sample_combinations(const parameters p, catalogue & c
         std::vector < vars >  sums_i;
         for(int j=0; j < cat_2.samp.size(); j++){
         
-            double dist_samps = min_samp_dist(cat_1.samp[i].edge, cat_2.samp[j].edge);
+            double dist_samps = min_samp_dist(p, cat_1.samp[i].edge, cat_2.samp[j].edge);
 
             if(dist_samps <= p.r_max){
                 vars sums_ij = sums_pairs(p, cat_1.samp[i].obj, cat_2.samp[j].obj);

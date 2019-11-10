@@ -47,7 +47,7 @@ v1b_v2a = true
 
 # ==== binning ====
 r_min = 0.1
-r_max = 100
+r_max = 40
 numb_bin = 20
 lg_bins = true
 
@@ -67,7 +67,7 @@ periodic_box = true
 # ==== jack-knifing ====
 # cartesian subsamples (used when mode = box)
 # split volume into (nx,ny,nz) pieces along each axis => nx*ny*nz samples in total
-numb_jk_cart  = 4,4,4
+numb_jk_cart  = 8,8,8
 
 # subsamples on shell (used when mode = shell)
 # nside sets number of healpix samples on sphere (must be power of 2)
