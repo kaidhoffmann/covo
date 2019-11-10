@@ -64,22 +64,6 @@ template <typename T> inline double vabs(const std::vector<T> vec) {
 
 
 // ==========================================================
-// distance between two Nd positions
-// ==========================================================
-template <typename T> inline double distance(const std::vector <T> & pos_1,  const std::vector <T> & pos_2){
-    
-    T dist=0;
-    
-    for(int i=0; i<pos_1.size();i++){
-        dist += pow(pos_2[i] - pos_1[i],2);
-    }
-    
-    return sqrt(dist);
-};
-
-
-
-// ==========================================================
 // 1D distance in periodic box
 // ==========================================================
 template <typename T> inline T periodic_distance(T dr, T Lbox, T r_max){
