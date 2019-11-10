@@ -1,6 +1,6 @@
 
 # set zero for silence
-verbose = 2
+verbose = 3
 
 
 # ==== input catalogues ====
@@ -67,7 +67,7 @@ periodic_box = true
 # ==== jack-knifing ====
 # cartesian subsamples (used when mode = box)
 # split volume into (nx,ny,nz) pieces along each axis => nx*ny*nz samples in total
-numb_jk_cart  = 8,8,8
+numb_jk_cart  = 4,4,4
 
 # subsamples on shell (used when mode = shell)
 # nside sets number of healpix samples on sphere (must be power of 2)
@@ -94,8 +94,8 @@ auto_limits = false
 # ==== random catalogue ====
 #make_rand = true: make random catalogue and use it instead of input catalogue 
 make_rand = false
-rand_seed = 123
-fname_rand = ./catalogues/random_1.csv
+rand_seed = 1234
+fname_rand = ./catalogues/random_2.csv
 
 # number of random points
-numb_rand = 10000
+numb_rand = 50000

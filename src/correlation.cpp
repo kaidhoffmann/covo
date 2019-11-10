@@ -41,34 +41,29 @@ double correlation::min_samp_dist(
     }
 
 
-    
+    //initialize min distance
     double dist_min = 0;
     for(int k=0; k<dim; k++){
-        double dk = edge_1[0][k] - edge_2[0][k];
-        double dk_prev = dk;
+        double dk = edge_2[0][k] - edge_1[0][k];
         if(periodic){ dk = periodic_distance(dk, Lbox[k], r_max); }
         dist_min += dk*dk;
     }
     dist_min = pow(dist_min,0.5);
 
-    
-    
+    //find min distances between edges of cell pair
     for(int i=0; i < edge_1.size(); i++){
         for(int j=0; j < edge_2.size(); j++){
             
             double dist = 0;
             for(int k=0; k<dim; k++){
-                double dk = edge_1[i][k] - edge_2[j][k];
+                double dk = edge_2[j][k] - edge_1[i][k];
                 if(periodic){ dk = periodic_distance(dk, Lbox[k], r_max); }
                 dist += dk*dk;                    
             }
             dist = pow(dist,0.5);
-            
             if(dist < dist_min){ dist_min = dist; }
-            
         }
     }
-        
     return dist_min;
 };
 
@@ -133,17 +128,17 @@ correlation::vars correlation::sums_pairs(
             
             double d[3]={0};
             
-            d[0] = obj_1[i].pos[0] - obj_2[j].pos[0];
+            d[0] = obj_2[j].pos[0] - obj_1[i].pos[0];
             if(periodic){ d[0] = periodic_distance(d[0], Lbox[0], r_max); }
             
             if(fabs(d[0]) < r_max){
                 
-                d[1] = obj_1[i].pos[1] - obj_2[j].pos[1];
+                d[1] = obj_2[j].pos[1] - obj_1[i].pos[1];
                 if(periodic){ d[1] = periodic_distance(d[1], Lbox[1], r_max); }
 
                 if(fabs(d[1]) < r_max){
                 
-                    d[2] = obj_1[i].pos[2] - obj_2[j].pos[2];
+                    d[2] = obj_2[j].pos[2] - obj_1[i].pos[2];
                     if(periodic){ d[2] = periodic_distance(d[2], Lbox[2], r_max); }
                     
                     if(fabs(d[2]) < r_max){
@@ -172,12 +167,8 @@ correlation::vars correlation::sums_pairs(
                                                 bin = (r_abs - p.r_min) / dr;
                                             }
                                             
-                                            std::vector < double > r_vec;
-                                            
-                                            for(int k=0; k<obj_1[i].pos.size(); k++){
-                                                r_vec.push_back( (obj_2[j].pos[k] - obj_1[i].pos[k])/ r_abs );
-                                            }     
-                                            
+                                            std::vector < double > r_vec = {d[0]/r_abs,d[1]/r_abs,d[2]/r_abs};
+
                                             sums_samp.counts[bin] ++;
 
                                             
@@ -196,8 +187,6 @@ correlation::vars correlation::sums_pairs(
                                             if(p.r12_v2b){
                                                 sums_samp.r12_v2b[bin] += pow(fabs(std::inner_product(std::begin(r_vec), std::end(r_vec), std::begin(obj_2[j].vec_b), 0.0)),p.expip);
                                             }
-                                            
-                                            
 
                                             if(p.v1a_v2a){
                                                 sums_samp.v1a_v2a[bin] += pow(fabs(std::inner_product(std::begin(obj_1[i].vec_a), std::end(obj_1[i].vec_a), std::begin(obj_2[j].vec_a), 0.0)),p.expip);
@@ -269,7 +258,7 @@ void correlation::sums_for_sample_combinations(const parameters p, catalogue & c
 
             if(dist_samps <= p.r_max){
                 vars sums_ij = sums_pairs(p, cat_1.samp[i].obj, cat_2.samp[j].obj);
-                sums_i.push_back(sums_ij);
+                sums_i.push_back(sums_ij);                
             }
         }
         
