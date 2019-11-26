@@ -15,8 +15,7 @@ fname_out_prefix = w
 fname_out_suffix = test
 fname_out_extention = csv
 
-dir_out = ./results/
-
+dir_out = /home/kai/Documents/IA/diagnostics/covo/results/HAGN/
 
 # ==== delimiter for input catalogue and output file ====
 # ("tab" for "\t", "space" for " ", anything else will be used directly)
@@ -37,12 +36,12 @@ cols_vec_b = 6,7,8
 # ==== combinations for which to compute inner product correlations ====
 r12_v1a = true
 r12_v1b = true
-r12_v2a = true
-r12_v2b = true
-v1a_v2a = true
-v1b_v2b = true
-v1a_v2b = true
-v1b_v2a = true
+r12_v2a = false
+r12_v2b = false
+v1a_v2a = false
+v1b_v2b = false
+v1a_v2b = false
+v1b_v2a = false
 
 
 # ==== binning ====
@@ -52,7 +51,7 @@ numb_bin = 20
 lg_bins = true
 
 # exponent for inner product
-expip = 2
+expip = 1
 
 
 # ==== operational mode ====
@@ -88,7 +87,7 @@ theta_lim = 0, 110
 phi_lim = 0, 120
 
 # ignore limits above and extract them from input catalogues
-auto_limits = false
+auto_limits = true
 
 
 # ==== random catalogue ====

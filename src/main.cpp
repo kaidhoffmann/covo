@@ -122,7 +122,7 @@ int main(int argc, char **argv){
     double diff_toll = 0.01; //tollerance in relative difference between box limits [%]
     bool lim_diff = vol_lim_diff(p, cat_1, cat_2, diff_toll);
     if(lim_diff){
-        if(p.verbose > 0) std::cout<< "#### WARINING: >" << diff_toll*100 <<" % difference in box limits of catalog 1 and catalog 2" << std::endl;
+        if(p.verbose > 0) std::cout<< "#### WARINING: >" << diff_toll*100 <<" % difference in box limits of catalog 1 and catalog 2 ####" << std::endl;
 
         if(p.periodic_box && p.mode=="box" && p.auto_limits){
             if(p.verbose > 0) std::cout<< " -> set periodic_box = false" << std::endl;
@@ -130,13 +130,11 @@ int main(int argc, char **argv){
         }
     }
 
-
     //cut out overlap region between catalogs
     if(p.auto_limits && !p.make_rand && p.fname_cat_1 != p.fname_cat_2){
         if(p.verbose > 1) std::cout<<"# cut out overlap region between cat 1 and cat 2\n" <<std::endl;
         cut_overlap(p, cat_1, cat_2);
     }
-    
     
     //set box limit parameters to actual values determined above
     if(p.mode=="box" && !p.make_rand){
@@ -144,7 +142,6 @@ int main(int argc, char **argv){
         p.y_lim = cat_1.pos_limits_cart[1];
         p.z_lim = cat_1.pos_limits_cart[2];
     }
-    
     
     //normalize input vectors
     cat_1.normalize_vectors();

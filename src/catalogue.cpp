@@ -248,17 +248,31 @@ bool vol_lim_diff(const parameters p, const catalogue & cat_1, const catalogue &
 
     bool lim_diff = false;
 
-    int dim = cat_1.input.obj[0].pos.size();
+    std::vector < std::vector < double > > limits_cat1, limits_cat2;
     
+    if(p.mode=="box"){
+        limits_cat1 = cat_1.pos_limits_cart;
+        limits_cat2 = cat_2.pos_limits_cart;
+    }
+
+    if(p.mode=="shell"){
+        limits_cat1 = cat_1.pos_limits_sphere;
+        limits_cat2 = cat_2.pos_limits_sphere;            
+    }
+    
+    int dim = limits_cat1.size();
+      
     for(int i=0; i<dim; i++){
         
-        double L1 = (cat_1.pos_limits_cart[i][1] - cat_1.pos_limits_cart[i][0]);
-        double L2 = (cat_2.pos_limits_cart[i][1] - cat_2.pos_limits_cart[i][0]);
-        double D = fabs(cat_1.pos_limits_cart[i][0] - cat_2.pos_limits_cart[i][0]);            
-        double diff_1 = D / L1;
-        double diff_2 = D / L2;
+        double L1 = limits_cat1[i][1] - limits_cat1[i][0];
+        double L2 = limits_cat2[i][1] - limits_cat2[i][0];
+        double D_lo = fabs(limits_cat1[i][0] - limits_cat2[i][0]);
+        double D_hi = fabs(limits_cat1[i][1] - limits_cat2[i][1]);
 
-        if(diff_1 > diff_toll || diff_2 > diff_toll){ lim_diff = true; }
+        if(D_lo / L1 > diff_toll) lim_diff = true;
+        if(D_lo / L2 > diff_toll) lim_diff = true;
+        if(D_hi / L1 > diff_toll) lim_diff = true;
+        if(D_hi / L2 > diff_toll) lim_diff = true;
     }
     
     return lim_diff;

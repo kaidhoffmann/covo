@@ -1,8 +1,10 @@
-./catalogues/mice_halos_1.csv
+./covo.params_hagn
 
-./catalogues/mice_halos_2.csv
+./covo.params_flagship
 
-./catalogues/mice_halos_3.csv
+./run_covo_hagn.sh
+
+./run_covo_flagship.sh
 
 ./src/results/
 
