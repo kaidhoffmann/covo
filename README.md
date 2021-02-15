@@ -20,8 +20,8 @@ option 1:   catalogue_1 is input argument, catalogue_2 is copied from catalogue_
 option 2:   catalogue_1 and catalogue_2 are input arguments  
 ./covo covo.params catalogue_1.csv catalogue_2.csv  
 
-option 3:   suffix for output file as last argument  
-./covo covo.params catalogue_1.csv catalogue_2.csv suffix_for_output_file  
+option 3:   output file or suffix for output file as last argument (options can are set in parameter file)  
+./covo covo.params catalogue_1.csv catalogue_2.csv output_file.csv
 
 
 ## parameters

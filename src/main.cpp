@@ -46,7 +46,7 @@ int main(int argc, char **argv){
     }
     
     if(argc>=5){
-        p.fname_out_suffix = argv[4];        
+        p.fname_out_suffix = argv[4];
     }
     
     if(p.verbose > 1) p.print();
@@ -195,6 +195,9 @@ int main(int argc, char **argv){
     //make filename
     if(p.fname_out == "auto"){
         p.fname_out = p.dir_out + p.fname_out_prefix + "_" + p.fname_out_suffix + "." + p.fname_out_extention;
+    }
+    if(p.fname_out == "input"){
+        p.fname_out = p.fname_out_suffix;
     }
     
     //write results

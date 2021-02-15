@@ -234,12 +234,15 @@ void parameters::print(){
     std::cout << "# fname_cat_1: " << fname_cat_1 << std::endl;
     std::cout << "# fname_cat_2: " << fname_cat_2 << std::endl;
     
-    std::cout<< "# fname_out_prefix: " << fname_out_prefix << std::endl;
-    std::cout<< "# fname_out_suffix: " << fname_out_suffix << std::endl;
-    std::cout<< "# fname_out_extention: " << fname_out_extention << std::endl;
-    
-    std::cout << "# dir_out: " << dir_out << std::endl;
-    
+    if(fname_out == "auto"){
+        std::cout<< "# fname_out_prefix: " << fname_out_prefix << std::endl;
+        std::cout<< "# fname_out_suffix: " << fname_out_suffix << std::endl;
+        std::cout<< "# fname_out_extention: " << fname_out_extention << std::endl;
+        std::cout << "# dir_out: " << dir_out << std::endl;
+    }else if(fname_out == "input"){
+        std::cout<< "# fname_out: " << fname_out << std::endl;        
+    }
+        
     std::cout << "# delim_in: " << delim_in << std::endl;
     std::cout << "# delim_out: " << delim_out << std::endl;
 
