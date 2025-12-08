@@ -21,3 +21,6 @@
 ./src/main.o
 
 ./covo
+
+# Test outputs (baselines should be committed)
+./tests/output/

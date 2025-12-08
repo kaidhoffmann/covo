@@ -1,0 +1,90 @@
+
+# Regression test parameter file for flagship mode (shell)
+# Based on covo.params_flagship, optimized for fast testing
+
+# set zero for silence
+verbose = 1
+
+# ==== input catalogues ====
+# Using files from run_covo_flagship.sh (shell mode)
+fname_cat_1 = ./tests/data/shell_mode_cat1.csv
+fname_cat_2 = ./tests/data/shell_mode_cat2.csv
+
+# ==== variables for output filename ====
+# Use "auto" to construct full path: dir_out + prefix + suffix + extension
+fname_out = auto
+fname_out_prefix = w
+fname_out_suffix = regression_test_shell
+fname_out_extention = csv
+
+dir_out = ./tests/output/
+
+# ==== delimiter for input catalogue and output file ====
+delim_in = ,
+delim_out = space
+
+# ==== add header to output file ====
+header_out = true
+
+# ==== columns for positions and vectors in input file ====
+cols_pos = 0,1,2
+cols_vec_a = 3,4,5
+cols_vec_b = 6,7,8
+
+# ==== combinations for which to compute inner product correlations ====
+r12_v1a = true
+r12_v1b = true
+r12_v2a = false
+r12_v2b = false
+v1a_v2a = false
+v1b_v2b = false
+v1a_v2b = false
+v1b_v2a = false
+
+# ==== binning ====
+# Smaller bins for faster testing
+r_min = 0.1
+r_max = 20
+numb_bin = 10
+lg_bins = true
+
+# exponent for inner product
+expip = 1
+
+# ==== operational mode ====
+# shell: errors are derived from healpix subsamples with radial bins
+mode = shell
+
+# ==== periodic boundaries ====
+periodic_box = false
+
+# ==== jack-knifing ====
+# subsamples on shell (used when mode = shell)
+# nside sets number of healpix samples on sphere (must be power of 2)
+# nrad = number of radial bins
+# Smaller values for faster testing
+nside = 4
+nrad = 1
+
+numb_jk_cart  = 4,4,4
+
+# ==== min/max positions in catalogue =====
+# cartesian coordinates (used when mode = box)
+x_lim = 0,200
+y_lim = 0,200
+z_lim = 0,200
+
+# spherical coordinates (used when mode = shell)
+r_lim = 200, 250
+theta_lim = 0, 90
+phi_lim = 0, 90
+
+# ignore limits above and extract them from input catalogues
+auto_limits = true
+
+# ==== random catalogue ====
+make_rand = false
+rand_seed = 1234
+fname_rand = ./tests/data/shell_mode_cat2.csv
+numb_rand = 50000
+
