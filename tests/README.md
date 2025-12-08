@@ -15,9 +15,15 @@ Regression tests ensure that code changes do not alter the numerical results of 
 ```
 tests/
 ├── README.md                    # This file
-├── covo.params.test            # Test parameter file (optimized for fast testing)
+├── covo.params.test_box_mode   # Box mode test parameter file
+├── covo.params.test_shell_mode # Shell mode test parameter file
 ├── compare_outputs.py          # Python script for comparing outputs
 ├── run_regression_tests.sh     # Main test runner script
+├── data/                        # Test input catalogues
+│   ├── box_mode_cat1.csv       # Box mode catalogue 1
+│   ├── box_mode_cat2.csv       # Box mode catalogue 2
+│   ├── shell_mode_cat1.csv     # Shell mode catalogue 1
+│   └── shell_mode_cat2.csv     # Shell mode catalogue 2
 ├── baseline/                    # Reference output files (committed to git)
 │   └── regression_test.csv     # Baseline output for main test
 └── output/                      # Test output files (git-ignored)
@@ -67,7 +73,7 @@ make -C src test
 
 ## Test Configuration
 
-The test uses `covo.params.test`, which is optimized for:
+The tests use parameter files (`covo.params.test_box_mode` and `covo.params.test_shell_mode`), which are optimized for:
 - **Fast execution**: Smaller bin counts and fewer jack-knife samples
 - **Deterministic results**: Fixed random seed, specific input files
 - **Comprehensive coverage**: Tests main correlation computation paths
@@ -76,7 +82,7 @@ The test uses `covo.params.test`, which is optimized for:
 
 To add more test cases:
 
-1. Create additional parameter files (e.g., `covo.params.test2`)
+1. Create additional parameter files (e.g., `covo.params.test_new`)
 2. Add test cases to `run_regression_tests.sh`
 3. Generate baseline outputs for each test case
 
@@ -168,7 +174,7 @@ To add a new test case:
 
 1. **Create test parameter file**:
    ```bash
-   cp tests/covo.params.test tests/covo.params.test_new
+   cp tests/covo.params.test_box_mode tests/covo.params.test_new
    # Edit parameters as needed
    ```
 

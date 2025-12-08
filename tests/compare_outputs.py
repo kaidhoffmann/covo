@@ -13,6 +13,13 @@ import sys
 import os
 import argparse
 import numpy as np
+try:
+    import matplotlib
+    matplotlib.use('Agg')  # Use non-interactive backend
+    import matplotlib.pyplot as plt
+    HAS_MATPLOTLIB = True
+except ImportError:
+    HAS_MATPLOTLIB = False
 
 def parse_covo_output(filename):
     """
@@ -180,6 +187,144 @@ Examples:
     
     sys.exit(0 if match else 1)
 
+def plot_comparison(baseline_box, test_box, baseline_shell, test_shell, output_file='tests/output/comparison_plot.png', x_shift=0.02):
+    """
+    Generate a comparison plot with two panels (box mode and shell mode).
+    
+    Parameters:
+    -----------
+    baseline_box : str
+        Path to box mode baseline file
+    test_box : str
+        Path to box mode test output file
+    baseline_shell : str
+        Path to shell mode baseline file
+    test_shell : str
+        Path to shell mode test output file
+    output_file : str
+        Path to save the plot
+    x_shift : float
+        Shift factor for x-values to separate baseline and test points
+        Baseline: x * (1 - x_shift), Test: x * (1 + x_shift)
+    """
+    if not HAS_MATPLOTLIB:
+        print("Warning: matplotlib not available, skipping plot generation")
+        return
+    
+    # Parse all files
+    try:
+        _, data_box_base = parse_covo_output(baseline_box)
+        _, data_box_test = parse_covo_output(test_box)
+        _, data_shell_base = parse_covo_output(baseline_shell)
+        _, data_shell_test = parse_covo_output(test_shell)
+    except Exception as e:
+        print(f"Error parsing files for plotting: {e}")
+        return
+    
+    # Create figure with two subplots
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    
+    # Plot box mode (left panel)
+    r_box_base = data_box_base[:, 1]  # Column 1: r
+    r12_v1a_box_base = data_box_base[:, 3]  # Column 3: r12_v1a
+    r12_v1a_std_box_base = data_box_base[:, 4]  # Column 4: r12_v1a_std
+    r12_v1b_box_base = data_box_base[:, 5]  # Column 5: r12_v1b
+    r12_v1b_std_box_base = data_box_base[:, 6]  # Column 6: r12_v1b_std
+    
+    r_box_test = data_box_test[:, 1]
+    r12_v1a_box_test = data_box_test[:, 3]
+    r12_v1a_std_box_test = data_box_test[:, 4]
+    r12_v1b_box_test = data_box_test[:, 5]
+    r12_v1b_std_box_test = data_box_test[:, 6]
+    
+    # Baseline plots (solid lines) - offset x by (1 - x_shift)
+    ax1.errorbar(r_box_base * (1 - x_shift), r12_v1a_box_base, yerr=r12_v1a_std_box_base,
+                 fmt='o-', color='red', label='baseline r12_v1a', capsize=3)
+    ax1.errorbar(r_box_base * (1 - x_shift), r12_v1b_box_base, yerr=r12_v1b_std_box_base,
+                 fmt='o-', color='red', label='baseline r12_v1b', capsize=3)
+    
+    # Test plots (x markers) - offset x by (1 + x_shift)
+    ax1.errorbar(r_box_test * (1 + x_shift), r12_v1a_box_test, yerr=r12_v1a_std_box_test,
+                 fmt='x', color='blue', label='test r12_v1a', capsize=2)
+    ax1.errorbar(r_box_test * (1 + x_shift), r12_v1b_box_test, yerr=r12_v1b_std_box_test,
+                 fmt='x', color='blue', label='test r12_v1b', capsize=2)
+    
+    # Reference line at 0.5
+    ax1.axhline(y=0.5, color='gray', linestyle=':', alpha=0.5, linewidth=1)
+    
+    ax1.set_xlabel('r', fontsize=12)
+    ax1.set_ylabel('Correlation', fontsize=12)
+    ax1.set_title('Box Mode', fontsize=14, fontweight='bold')
+    ax1.set_xscale('log')
+    ax1.legend(fontsize=9, loc='best')
+    ax1.grid(True, alpha=0.3)
+    
+    # Plot shell mode (right panel)
+    r_shell_base = data_shell_base[:, 1]
+    r12_v1a_shell_base = data_shell_base[:, 3]
+    r12_v1a_std_shell_base = data_shell_base[:, 4]
+    r12_v1b_shell_base = data_shell_base[:, 5]
+    r12_v1b_std_shell_base = data_shell_base[:, 6]
+    
+    r_shell_test = data_shell_test[:, 1]
+    r12_v1a_shell_test = data_shell_test[:, 3]
+    r12_v1a_std_shell_test = data_shell_test[:, 4]
+    r12_v1b_shell_test = data_shell_test[:, 5]
+    r12_v1b_std_shell_test = data_shell_test[:, 6]
+    
+    # Baseline plots (solid lines) - offset x by (1 - x_shift)
+    ax2.errorbar(r_shell_base * (1 - x_shift), r12_v1a_shell_base, yerr=r12_v1a_std_shell_base,
+                 fmt='o-', color='red', label='baseline r12_v1a', capsize=3)
+    ax2.errorbar(r_shell_base * (1 - x_shift), r12_v1b_shell_base, yerr=r12_v1b_std_shell_base,
+                 fmt='o-', color='red', label='baseline r12_v1b', capsize=3)
+    
+    # Test plots (x markers) - offset x by (1 + x_shift)
+    ax2.errorbar(r_shell_test * (1 + x_shift), r12_v1a_shell_test, yerr=r12_v1a_std_shell_test,
+                 fmt='x', color='blue', label='test r12_v1a', capsize=2)
+    ax2.errorbar(r_shell_test * (1 + x_shift), r12_v1b_shell_test, yerr=r12_v1b_std_shell_test,
+                 fmt='x', color='blue', label='test r12_v1b', capsize=2)
+    
+    # Reference line at 0.5
+    ax2.axhline(y=0.5, color='gray', linestyle=':', alpha=0.5, linewidth=1)
+    
+    ax2.set_xlabel('r', fontsize=12)
+    ax2.set_ylabel('Correlation', fontsize=12)
+    ax2.set_title('Shell Mode', fontsize=14, fontweight='bold')
+    ax2.set_xscale('log')
+    ax2.legend(fontsize=9, loc='best')
+    ax2.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    
+    # Save plot
+    os.makedirs(os.path.dirname(output_file) if os.path.dirname(output_file) else '.', exist_ok=True)
+    plt.savefig(output_file, dpi=150, bbox_inches='tight')
+    print(f"Plot saved to: {output_file}")
+    plt.close()
+
 if __name__ == '__main__':
-    main()
+    # Check if we're being called with plot command
+    if len(sys.argv) > 1 and sys.argv[1] == 'plot':
+        # Remove 'plot' from argv before parsing
+        sys.argv.pop(1)
+        # Plot mode: compare all baseline vs test files
+        parser = argparse.ArgumentParser(description='Generate comparison plot for regression tests')
+        parser.add_argument('--baseline-box', default='tests/baseline/w_regression_test_box.csv',
+                          help='Path to box mode baseline file')
+        parser.add_argument('--test-box', default='tests/output/w_regression_test_box.csv',
+                          help='Path to box mode test output file')
+        parser.add_argument('--baseline-shell', default='tests/baseline/w_regression_test_shell.csv',
+                          help='Path to shell mode baseline file')
+        parser.add_argument('--test-shell', default='tests/output/w_regression_test_shell.csv',
+                          help='Path to shell mode test output file')
+        parser.add_argument('--output', default='tests/output/comparison_plot.png',
+                          help='Output file for the plot')
+        parser.add_argument('--x-shift', type=float, default=0.02,
+                          help='Shift factor for x-values to separate baseline and test points (default: 0.05)')
+        
+        args = parser.parse_args()
+        plot_comparison(args.baseline_box, args.test_box, args.baseline_shell, args.test_shell, args.output, args.x_shift)
+    else:
+        # Normal comparison mode
+        main()
 
