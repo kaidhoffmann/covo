@@ -174,34 +174,39 @@ std::vector < std::vector < double > > catalogue::find_limits_sphere(sample smp)
 // obtain cell ID for object from its position for cartesian subsamples
 // ==========================================================
 int catalogue::pos_to_ID_cart(
-    const std::vector < int > & numb_jk_cart,
-    const std::vector < double > & pos,
-    const std::vector < std::vector < double > > & pos_limits,
-    const std::vector < double > & Lcell){
+    const std::vector<int>& numb_jk_cart,
+    const std::vector<double>& pos,
+    const std::vector<std::vector<double>>& pos_limits,
+    const std::vector<double>& Lcell)
+{
+    const std::size_t N = pos.size();
 
-    int jk_coords[pos.size()]={0};
-
-    for(int i=0; i< pos.size(); i++){
-        
-        jk_coords[i] = int( (pos[i] - pos_limits[i][0]) / Lcell[i] );
+    if (numb_jk_cart.size() != N ||
+        pos_limits.size()   != N ||
+        Lcell.size()        != N)
+    {
+        throw std::runtime_error("pos_to_ID_cart: dimension mismatch");
     }
-    
-    //TODO: make for n dimensions
-    if(numb_jk_cart.size()==3){            
-        int ID =
-        jk_coords[2] * numb_jk_cart[1] *numb_jk_cart[2] +
-        jk_coords[1] * numb_jk_cart[1] +
-        jk_coords[0];
 
-        return ID;
-    
-    }else{
-        std::cerr<< "#### ERROR [catalogue::jk_samples]: number of dimensions must be 3" << std::endl;
-        exit (EXIT_FAILURE);
+    // Compute jk-coordinates
+    std::vector<int> jk_coords(N);
+    for (std::size_t i = 0; i < N; ++i) {
+        jk_coords[i] = static_cast<int>(
+            (pos[i] - pos_limits[i][0]) / Lcell[i]
+        );
     }
-    
+
+    // Linearize N-dimensional index
+    int ID = 0;
+    int stride = 1;
+
+    for (std::size_t i = 0; i < N; ++i) {
+        ID += jk_coords[i] * stride;
+        stride *= numb_jk_cart[i];
+    }
+
+    return ID;
 }
-
 
 
 // ==========================================================
