@@ -1,0 +1,83 @@
+
+# Regression test parameter file
+# This file is optimized for fast, deterministic regression testing
+
+# set zero for silence
+verbose = 1
+
+# ==== input catalogues ====
+fname_cat_1 = ./catalogues/random_1.csv
+fname_cat_2 = ./catalogues/random_2.csv
+
+# ==== variables for output filename ====
+# Use "auto" to construct full path: dir_out + prefix + suffix + extension
+fname_out = auto
+fname_out_prefix = w
+fname_out_suffix = regression_test
+fname_out_extention = csv
+
+dir_out = ./tests/output/
+
+# ==== delimiter for input catalogue and output file ====
+delim_in = ,
+delim_out = space
+
+# ==== add header to output file ====
+header_out = true
+
+# ==== columns for positions and vectors in input file ====
+cols_pos = 0,1,2
+cols_vec_a = 3,4,5
+cols_vec_b = 6,7,8
+
+# ==== combinations for which to compute inner product correlations ====
+r12_v1a = true
+r12_v1b = true
+r12_v2a = false
+r12_v2b = false
+v1a_v2a = false
+v1b_v2b = false
+v1a_v2b = false
+v1b_v2a = false
+
+# ==== binning ====
+# Smaller bins for faster testing
+r_min = 0.1
+r_max = 20
+numb_bin = 10
+lg_bins = true
+
+# exponent for inner product
+expip = 1
+
+# ==== operational mode ====
+mode = box
+
+# ==== periodic boundaries ====
+periodic_box = true
+
+# ==== jack-knifing ====
+# Smaller number of samples for faster testing
+numb_jk_cart  = 2,2,2
+
+nside = 4
+nrad = 3
+
+# ==== min/max positions in catalogue =====
+x_lim = 0,200
+y_lim = 0,200
+z_lim = 0,200
+
+r_lim = 200, 250
+theta_lim = 0, 110
+phi_lim = 0, 120
+
+# ignore limits above and extract them from input catalogues
+auto_limits = true
+
+# ==== random catalogue ====
+make_rand = false
+rand_seed = 1234
+fname_rand = ./catalogues/random_2.csv
+numb_rand = 50000
+

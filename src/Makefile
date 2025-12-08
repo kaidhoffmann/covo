@@ -25,3 +25,13 @@ correlation.o: correlation.cpp
 
 healpix.o: healpix.cpp
 	${CC} -c healpix.cpp ${LDFLAGS}
+
+# Regression testing
+.PHONY: test
+test:
+	@cd .. && bash tests/run_regression_tests.sh
+
+.PHONY: test-baseline
+test-baseline:
+	@cd .. && bash tests/run_regression_tests.sh || true
+	@echo "Baseline generation complete. Review tests/baseline/ before committing."
