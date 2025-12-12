@@ -1,0 +1,29 @@
+name: Regression Tests (C++)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Fetch repo
+      - uses: actions/checkout@v4
+
+      # 2. Install build tools (only what you need)
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y make g++ cmake
+
+      # 3. Build your code in src/
+      - name: Build
+        run: |
+          cd src
+          make
+
+      # 4. Run your regression tests
+      - name: Run regression tests
+        run: make -C src test
