@@ -194,19 +194,19 @@ correlation::vars correlation::sums_pairs(
                     if (fabs(d[2]) < r_max)
                     {
 
-                        float r_sq_01 = d[0] * d[0] + d[1] * d[1];
+                        double r_sq_01 = d[0] * d[0] + d[1] * d[1];
                         if (r_sq_01 < r_max_sq)
                         {
 
-                            float r_sq_02 = d[0] * d[0] + d[2] * d[2];
+                            double r_sq_02 = d[0] * d[0] + d[2] * d[2];
                             if (r_sq_02 < r_max_sq)
                             {
 
-                                float r_sq_12 = d[1] * d[1] + d[2] * d[2];
+                                double r_sq_12 = d[1] * d[1] + d[2] * d[2];
                                 if (r_sq_12 < r_max_sq)
                                 {
 
-                                    float r_sq = (r_sq_01 + r_sq_12 + r_sq_02) * 0.5;
+                                    double r_sq = (r_sq_01 + r_sq_12 + r_sq_02) * 0.5;
 
                                     if (r_sq < r_max_sq)
                                     {
@@ -221,11 +221,11 @@ correlation::vars correlation::sums_pairs(
                                             }
                                             else
                                             {
-                                                float r_abs = sqrt(r_sq);
+                                                double r_abs = sqrt(r_sq);
                                                 bin = (r_abs - p.r_min) / dr;
                                             }
 
-                                            float r_inv = 1.0f / sqrt(r_sq);
+                                            double r_inv = 1.0f / sqrt(r_sq);
                                             double r_vec[3] = {d[0] * r_inv, d[1] * r_inv, d[2] * r_inv};
 
                                             sums_samp.counts[bin]++;
