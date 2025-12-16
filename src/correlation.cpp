@@ -119,6 +119,8 @@ correlation::vars correlation::sums_pairs(
     double r_max_sq = pow(p.r_max, 2);
     double lg_r_min = log10(p.r_min);
     double dlg_r = (log10(p.r_max) - log10(p.r_min)) / double(p.numb_bin);
+    const double inv_dr = 1.0 / dr;
+    const double inv_dlg_r = 1.0 / dlg_r;
     const double expip = p.expip;
 
     vars sums_samp;
@@ -229,12 +231,12 @@ correlation::vars correlation::sums_pairs(
 
                                 if (p.lg_bins)
                                 {
-                                    bin = (0.5 * log10(r_sq) - lg_r_min) / dlg_r;
+                                    bin = (0.5 * log10(r_sq) - lg_r_min) * inv_dlg_r;
                                 }
                                 else
                                 {
                                     double r_abs = sqrt(r_sq);
-                                    bin = (r_abs - p.r_min) / dr;
+                                    bin = (r_abs - p.r_min) * inv_dr;
                                 }
 
                                 double r_inv = 1.0f / sqrt(r_sq);
