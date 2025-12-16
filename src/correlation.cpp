@@ -213,16 +213,15 @@ correlation::vars correlation::sums_pairs(
                                         if (r_sq > r_min_sq)
                                         {
 
-                                            float r_abs = sqrt(r_sq); // sqrt takes most of the time until here.. do binning in r^2 space?
-
                                             int bin;
 
                                             if (p.lg_bins)
                                             {
-                                                bin = (log10(r_abs) - lg_r_min) / dlg_r;
+                                                bin = (0.5 * log10(r_sq) - lg_r_min) / dlg_r;
                                             }
                                             else
                                             {
+                                                float r_abs = sqrt(r_sq);
                                                 bin = (r_abs - p.r_min) / dr;
                                             }
 
