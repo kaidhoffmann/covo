@@ -225,7 +225,8 @@ correlation::vars correlation::sums_pairs(
                                                 bin = (r_abs - p.r_min) / dr;
                                             }
 
-                                            std::vector<double> r_vec = {d[0] / r_abs, d[1] / r_abs, d[2] / r_abs};
+                                            float r_inv = 1.0f / sqrt(r_sq);
+                                            double r_vec[3] = {d[0] * r_inv, d[1] * r_inv, d[2] * r_inv};
 
                                             sums_samp.counts[bin]++;
 
