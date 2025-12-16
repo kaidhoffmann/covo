@@ -16,6 +16,29 @@
 #include "correlation.h"
 #include "toolbox.h"
 
+namespace
+{
+inline double dot_arr_vec(const double *a, const std::vector<double> &b)
+{
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+inline double dot_vec_vec(const std::vector<double> &a, const std::vector<double> &b)
+{
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+inline double pow_exp(double v, double expip)
+{
+    double av = fabs(v);
+    if (expip == 1.0)
+        return av;
+    if (expip == 2.0)
+        return av * av;
+    return pow(av, expip);
+}
+} // namespace
+
 // ==========================================================
 // mimimal distance between two samples defined by their edges
 // ==========================================================
@@ -96,6 +119,7 @@ correlation::vars correlation::sums_pairs(
     double r_max_sq = pow(p.r_max, 2);
     double lg_r_min = log10(p.r_min);
     double dlg_r = (log10(p.r_max) - log10(p.r_min)) / double(p.numb_bin);
+    const double expip = p.expip;
 
     vars sums_samp;
 
@@ -216,65 +240,46 @@ correlation::vars correlation::sums_pairs(
                                 double r_inv = 1.0f / sqrt(r_sq);
                                 double r_vec[3] = {d[0] * r_inv, d[1] * r_inv, d[2] * r_inv};
 
-                                auto dot_arr_arr = [](const double *a, const double *b)
-                                { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; };
-
-                                auto dot_arr_vec = [](const double *a, const std::vector<double> &b)
-                                { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; };
-
-                                auto dot_vec_vec = [](const std::vector<double> &a, const std::vector<double> &b)
-                                { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; };
-
-                                auto pow_exp = [&](double v)
-                                {
-                                    double av = fabs(v);
-                                    if (p.expip == 1.0)
-                                        return av;
-                                    if (p.expip == 2.0)
-                                        return av * av;
-                                    return pow(av, p.expip);
-                                };
-
                                 sums_samp.counts[bin]++;
 
                                 if (p.r12_v1a)
                                 {
-                                    sums_samp.r12_v1a[bin] += pow_exp(dot_arr_vec(r_vec, obj_1[i].vec_a));
+                                    sums_samp.r12_v1a[bin] += pow_exp(dot_arr_vec(r_vec, obj_1[i].vec_a), expip);
                                 }
 
                                 if (p.r12_v1b)
                                 {
-                                    sums_samp.r12_v1b[bin] += pow_exp(dot_arr_vec(r_vec, obj_1[i].vec_b));
+                                    sums_samp.r12_v1b[bin] += pow_exp(dot_arr_vec(r_vec, obj_1[i].vec_b), expip);
                                 }
 
                                 if (p.r12_v2a)
                                 {
-                                    sums_samp.r12_v2a[bin] += pow_exp(dot_arr_vec(r_vec, obj_2[j].vec_a));
+                                    sums_samp.r12_v2a[bin] += pow_exp(dot_arr_vec(r_vec, obj_2[j].vec_a), expip);
                                 }
 
                                 if (p.r12_v2b)
                                 {
-                                    sums_samp.r12_v2b[bin] += pow_exp(dot_arr_vec(r_vec, obj_2[j].vec_b));
+                                    sums_samp.r12_v2b[bin] += pow_exp(dot_arr_vec(r_vec, obj_2[j].vec_b), expip);
                                 }
 
                                 if (p.v1a_v2a)
                                 {
-                                    sums_samp.v1a_v2a[bin] += pow_exp(dot_vec_vec(obj_1[i].vec_a, obj_2[j].vec_a));
+                                    sums_samp.v1a_v2a[bin] += pow_exp(dot_vec_vec(obj_1[i].vec_a, obj_2[j].vec_a), expip);
                                 }
 
                                 if (p.v1b_v2b)
                                 {
-                                    sums_samp.v1b_v2b[bin] += pow_exp(dot_vec_vec(obj_1[i].vec_b, obj_2[j].vec_b));
+                                    sums_samp.v1b_v2b[bin] += pow_exp(dot_vec_vec(obj_1[i].vec_b, obj_2[j].vec_b), expip);
                                 }
 
                                 if (p.v1a_v2b)
                                 {
-                                    sums_samp.v1a_v2b[bin] += pow_exp(dot_vec_vec(obj_1[i].vec_a, obj_2[j].vec_b));
+                                    sums_samp.v1a_v2b[bin] += pow_exp(dot_vec_vec(obj_1[i].vec_a, obj_2[j].vec_b), expip);
                                 }
 
                                 if (p.v1b_v2a)
                                 {
-                                    sums_samp.v1b_v2a[bin] += pow_exp(dot_vec_vec(obj_1[i].vec_b, obj_2[j].vec_a));
+                                    sums_samp.v1b_v2a[bin] += pow_exp(dot_vec_vec(obj_1[i].vec_b, obj_2[j].vec_a), expip);
                                 }
                             }
                         }
