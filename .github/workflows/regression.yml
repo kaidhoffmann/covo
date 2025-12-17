@@ -16,7 +16,7 @@ jobs:
 
       # 2. Install build tools (only what you need)
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y make g++ cmake
+        run: sudo apt-get update && sudo apt-get install -y make g++ cmake python3-numpy
 
       # 3. Build your code in src/
       - name: Build
