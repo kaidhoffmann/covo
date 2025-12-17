@@ -11,6 +11,7 @@
 #include <numeric>
 #include <algorithm>
 #include <functional> // std::divides
+#include <array>
 #include "parameters.h"
 #include "catalogue.h"
 #include "correlation.h"
@@ -113,12 +114,12 @@ correlation::vars correlation::sums_pairs(
     const std::vector<catalogue::object> &obj_2)
 {
 
-    double dr = (p.r_max - p.r_min) / double(p.numb_bin);
-    double r_max = float(p.r_max);
-    double r_min_sq = pow(p.r_min, 2);
-    double r_max_sq = pow(p.r_max, 2);
-    double lg_r_min = log10(p.r_min);
-    double dlg_r = (log10(p.r_max) - log10(p.r_min)) / double(p.numb_bin);
+    const double dr = (p.r_max - p.r_min) / static_cast<double>(p.numb_bin);
+    const double r_max = static_cast<double>(p.r_max);
+    const double r_min_sq = p.r_min * p.r_min;
+    const double r_max_sq = p.r_max * p.r_max;
+    const double lg_r_min = log10(p.r_min);
+    const double dlg_r = (log10(p.r_max) - log10(p.r_min)) / static_cast<double>(p.numb_bin);
     const double inv_dr = 1.0 / dr;
     const double inv_dlg_r = 1.0 / dlg_r;
     const double expip = p.expip;
@@ -126,9 +127,7 @@ correlation::vars correlation::sums_pairs(
     vars sums_samp;
 
     // initialize
-    sums_samp.counts.clear();
-    sums_samp.counts.resize(p.numb_bin, 0);
-
+    sums_samp.counts.assign(p.numb_bin, 0);
     sums_samp.r12_v1a.clear();
     sums_samp.r12_v1b.clear();
     sums_samp.r12_v2a.clear();
@@ -174,7 +173,7 @@ correlation::vars correlation::sums_pairs(
     }
 
     // box size
-    double Lbox[3] = {0};
+    std::array<double, 3> Lbox{};
     if (p.mode == "box")
     {
         Lbox[0] = p.x_lim[1] - p.x_lim[0];
@@ -182,16 +181,17 @@ correlation::vars correlation::sums_pairs(
         Lbox[2] = p.z_lim[1] - p.z_lim[0];
     }
 
-    bool periodic = false;
-    if (p.mode == "box" && p.periodic_box)
-        periodic = true;
+    const bool periodic = (p.mode == "box" && p.periodic_box);
 
-    for (int i = 0; i < obj_1.size(); i++)
+    const std::size_t n1 = obj_1.size();
+    const std::size_t n2 = obj_2.size();
+
+    for (std::size_t i = 0; i < n1; i++)
     {
-        for (int j = 0; j < obj_2.size(); j++)
+        for (std::size_t j = 0; j < n2; j++)
         {
 
-            double d[3] = {0};
+            std::array<double, 3> d{};
 
             d[0] = obj_2[j].pos[0] - obj_1[i].pos[0];
             if (periodic)
@@ -231,12 +231,12 @@ correlation::vars correlation::sums_pairs(
 
                                 if (p.lg_bins)
                                 {
-                                    bin = (0.5 * log10(r_sq) - lg_r_min) * inv_dlg_r;
+                                    bin = static_cast<int>((0.5 * log10(r_sq) - lg_r_min) * inv_dlg_r);
                                 }
                                 else
                                 {
-                                    double r_abs = sqrt(r_sq);
-                                    bin = (r_abs - p.r_min) * inv_dr;
+                                    const double r_abs = sqrt(r_sq);
+                                    bin = static_cast<int>((r_abs - p.r_min) * inv_dr);
                                 }
 
                                 double r_inv = 1.0f / sqrt(r_sq);
