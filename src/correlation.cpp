@@ -11,10 +11,34 @@
 #include <numeric>
 #include <algorithm>
 #include <functional> // std::divides
+#include <array>
 #include "parameters.h"
 #include "catalogue.h"
 #include "correlation.h"
 #include "toolbox.h"
+
+namespace
+{
+inline double dot_arr_vec(const double *a, const std::vector<double> &b)
+{
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+inline double dot_vec_vec(const std::vector<double> &a, const std::vector<double> &b)
+{
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+inline double pow_exp(double v, double expip)
+{
+    double av = std::abs(v);
+    if (expip == 1.0)
+        return av;
+    if (expip == 2.0)
+        return av * av;
+    return pow(av, expip);
+}
+} // namespace
 
 // ==========================================================
 // mimimal distance between two samples defined by their edges
@@ -90,19 +114,20 @@ correlation::vars correlation::sums_pairs(
     const std::vector<catalogue::object> &obj_2)
 {
 
-    double dr = (p.r_max - p.r_min) / double(p.numb_bin);
-    double r_max = float(p.r_max);
-    double r_min_sq = pow(p.r_min, 2);
-    double r_max_sq = pow(p.r_max, 2);
-    double lg_r_min = log10(p.r_min);
-    double dlg_r = (log10(p.r_max) - log10(p.r_min)) / double(p.numb_bin);
+    const double dr = (p.r_max - p.r_min) / static_cast<double>(p.numb_bin);
+    const double r_max = static_cast<double>(p.r_max);
+    const double r_min_sq = p.r_min * p.r_min;
+    const double r_max_sq = p.r_max * p.r_max;
+    const double lg_r_min = log10(p.r_min);
+    const double dlg_r = (log10(p.r_max) - log10(p.r_min)) / static_cast<double>(p.numb_bin);
+    const double inv_dr = 1.0 / dr;
+    const double inv_dlg_r = 1.0 / dlg_r;
+    const double expip = p.expip;
 
     vars sums_samp;
 
     // initialize
-    sums_samp.counts.clear();
-    sums_samp.counts.resize(p.numb_bin, 0);
-
+    sums_samp.counts.assign(p.numb_bin, 0);
     sums_samp.r12_v1a.clear();
     sums_samp.r12_v1b.clear();
     sums_samp.r12_v2a.clear();
@@ -148,7 +173,7 @@ correlation::vars correlation::sums_pairs(
     }
 
     // box size
-    double Lbox[3] = {0};
+    std::array<double, 3> Lbox{};
     if (p.mode == "box")
     {
         Lbox[0] = p.x_lim[1] - p.x_lim[0];
@@ -156,16 +181,17 @@ correlation::vars correlation::sums_pairs(
         Lbox[2] = p.z_lim[1] - p.z_lim[0];
     }
 
-    bool periodic = false;
-    if (p.mode == "box" && p.periodic_box)
-        periodic = true;
+    const bool periodic = (p.mode == "box" && p.periodic_box);
 
-    for (int i = 0; i < obj_1.size(); i++)
+    const std::size_t n1 = obj_1.size();
+    const std::size_t n2 = obj_2.size();
+
+    for (std::size_t i = 0; i < n1; i++)
     {
-        for (int j = 0; j < obj_2.size(); j++)
+        for (std::size_t j = 0; j < n2; j++)
         {
 
-            double d[3] = {0};
+            std::array<double, 3> d{};
 
             d[0] = obj_2[j].pos[0] - obj_1[i].pos[0];
             if (periodic)
@@ -173,7 +199,7 @@ correlation::vars correlation::sums_pairs(
                 d[0] = periodic_distance(d[0], Lbox[0], r_max);
             }
 
-            if (fabs(d[0]) < r_max)
+            if (std::abs(d[0]) < r_max)
             {
 
                 d[1] = obj_2[j].pos[1] - obj_1[i].pos[1];
@@ -182,7 +208,7 @@ correlation::vars correlation::sums_pairs(
                     d[1] = periodic_distance(d[1], Lbox[1], r_max);
                 }
 
-                if (fabs(d[1]) < r_max)
+                if (std::abs(d[1]) < r_max)
                 {
 
                     d[2] = obj_2[j].pos[2] - obj_1[i].pos[2];
@@ -191,86 +217,71 @@ correlation::vars correlation::sums_pairs(
                         d[2] = periodic_distance(d[2], Lbox[2], r_max);
                     }
 
-                    if (fabs(d[2]) < r_max)
+                    if (std::abs(d[2]) < r_max)
                     {
 
-                        float r_sq_01 = d[0] * d[0] + d[1] * d[1];
-                        if (r_sq_01 < r_max_sq)
-                        {
+                        double r_sq = d[0] * d[0] + d[1] * d[1] + d[2] * d[2];
 
-                            float r_sq_02 = d[0] * d[0] + d[2] * d[2];
-                            if (r_sq_02 < r_max_sq)
+                        if (r_sq < r_max_sq)
+                        {
+                            if (r_sq > r_min_sq)
                             {
 
-                                float r_sq_12 = d[1] * d[1] + d[2] * d[2];
-                                if (r_sq_12 < r_max_sq)
+                                int bin;
+
+                                if (p.lg_bins)
                                 {
+                                    bin = static_cast<int>((0.5 * log10(r_sq) - lg_r_min) * inv_dlg_r);
+                                }
+                                else
+                                {
+                                    const double r_abs = sqrt(r_sq);
+                                    bin = static_cast<int>((r_abs - p.r_min) * inv_dr);
+                                }
 
-                                    float r_sq = (r_sq_01 + r_sq_12 + r_sq_02) * 0.5;
+                                double r_inv = 1.0f / sqrt(r_sq);
+                                double r_vec[3] = {d[0] * r_inv, d[1] * r_inv, d[2] * r_inv};
 
-                                    if (r_sq < r_max_sq)
-                                    {
-                                        if (r_sq > r_min_sq)
-                                        {
+                                sums_samp.counts[bin]++;
 
-                                            float r_abs = sqrt(r_sq); // sqrt takes most of the time until here.. do binning in r^2 space?
+                                if (p.r12_v1a)
+                                {
+                                    sums_samp.r12_v1a[bin] += pow_exp(dot_arr_vec(r_vec, obj_1[i].vec_a), expip);
+                                }
 
-                                            int bin;
+                                if (p.r12_v1b)
+                                {
+                                    sums_samp.r12_v1b[bin] += pow_exp(dot_arr_vec(r_vec, obj_1[i].vec_b), expip);
+                                }
 
-                                            if (p.lg_bins)
-                                            {
-                                                bin = (log10(r_abs) - lg_r_min) / dlg_r;
-                                            }
-                                            else
-                                            {
-                                                bin = (r_abs - p.r_min) / dr;
-                                            }
+                                if (p.r12_v2a)
+                                {
+                                    sums_samp.r12_v2a[bin] += pow_exp(dot_arr_vec(r_vec, obj_2[j].vec_a), expip);
+                                }
 
-                                            std::vector<double> r_vec = {d[0] / r_abs, d[1] / r_abs, d[2] / r_abs};
+                                if (p.r12_v2b)
+                                {
+                                    sums_samp.r12_v2b[bin] += pow_exp(dot_arr_vec(r_vec, obj_2[j].vec_b), expip);
+                                }
 
-                                            sums_samp.counts[bin]++;
+                                if (p.v1a_v2a)
+                                {
+                                    sums_samp.v1a_v2a[bin] += pow_exp(dot_vec_vec(obj_1[i].vec_a, obj_2[j].vec_a), expip);
+                                }
 
-                                            if (p.r12_v1a)
-                                            {
-                                                sums_samp.r12_v1a[bin] += pow(fabs(std::inner_product(std::begin(r_vec), std::end(r_vec), std::begin(obj_1[i].vec_a), 0.0)), p.expip);
-                                            }
+                                if (p.v1b_v2b)
+                                {
+                                    sums_samp.v1b_v2b[bin] += pow_exp(dot_vec_vec(obj_1[i].vec_b, obj_2[j].vec_b), expip);
+                                }
 
-                                            if (p.r12_v1b)
-                                            {
-                                                sums_samp.r12_v1b[bin] += pow(fabs(std::inner_product(std::begin(r_vec), std::end(r_vec), std::begin(obj_1[i].vec_b), 0.0)), p.expip);
-                                            }
+                                if (p.v1a_v2b)
+                                {
+                                    sums_samp.v1a_v2b[bin] += pow_exp(dot_vec_vec(obj_1[i].vec_a, obj_2[j].vec_b), expip);
+                                }
 
-                                            if (p.r12_v2a)
-                                            {
-                                                sums_samp.r12_v2a[bin] += pow(fabs(std::inner_product(std::begin(r_vec), std::end(r_vec), std::begin(obj_2[j].vec_a), 0.0)), p.expip);
-                                            }
-
-                                            if (p.r12_v2b)
-                                            {
-                                                sums_samp.r12_v2b[bin] += pow(fabs(std::inner_product(std::begin(r_vec), std::end(r_vec), std::begin(obj_2[j].vec_b), 0.0)), p.expip);
-                                            }
-
-                                            if (p.v1a_v2a)
-                                            {
-                                                sums_samp.v1a_v2a[bin] += pow(fabs(std::inner_product(std::begin(obj_1[i].vec_a), std::end(obj_1[i].vec_a), std::begin(obj_2[j].vec_a), 0.0)), p.expip);
-                                            }
-
-                                            if (p.v1b_v2b)
-                                            {
-                                                sums_samp.v1b_v2b[bin] += pow(fabs(std::inner_product(std::begin(obj_1[i].vec_b), std::end(obj_1[i].vec_b), std::begin(obj_2[j].vec_b), 0.0)), p.expip);
-                                            }
-
-                                            if (p.v1a_v2b)
-                                            {
-                                                sums_samp.v1a_v2b[bin] += pow(fabs(std::inner_product(std::begin(obj_1[i].vec_a), std::end(obj_1[i].vec_a), std::begin(obj_2[j].vec_b), 0.0)), p.expip);
-                                            }
-
-                                            if (p.v1b_v2a)
-                                            {
-                                                sums_samp.v1b_v2a[bin] += pow(fabs(std::inner_product(std::begin(obj_1[i].vec_b), std::end(obj_1[i].vec_b), std::begin(obj_2[j].vec_a), 0.0)), p.expip);
-                                            }
-                                        }
-                                    }
+                                if (p.v1b_v2a)
+                                {
+                                    sums_samp.v1b_v2a[bin] += pow_exp(dot_vec_vec(obj_1[i].vec_b, obj_2[j].vec_a), expip);
                                 }
                             }
                         }
