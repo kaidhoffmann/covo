@@ -31,7 +31,7 @@ inline double dot_vec_vec(const std::vector<double> &a, const std::vector<double
 
 inline double pow_exp(double v, double expip)
 {
-    double av = fabs(v);
+    double av = std::abs(v);
     if (expip == 1.0)
         return av;
     if (expip == 2.0)
@@ -199,7 +199,7 @@ correlation::vars correlation::sums_pairs(
                 d[0] = periodic_distance(d[0], Lbox[0], r_max);
             }
 
-            if (fabs(d[0]) < r_max)
+            if (std::abs(d[0]) < r_max)
             {
 
                 d[1] = obj_2[j].pos[1] - obj_1[i].pos[1];
@@ -208,7 +208,7 @@ correlation::vars correlation::sums_pairs(
                     d[1] = periodic_distance(d[1], Lbox[1], r_max);
                 }
 
-                if (fabs(d[1]) < r_max)
+                if (std::abs(d[1]) < r_max)
                 {
 
                     d[2] = obj_2[j].pos[2] - obj_1[i].pos[2];
@@ -217,7 +217,7 @@ correlation::vars correlation::sums_pairs(
                         d[2] = periodic_distance(d[2], Lbox[2], r_max);
                     }
 
-                    if (fabs(d[2]) < r_max)
+                    if (std::abs(d[2]) < r_max)
                     {
 
                         double r_sq = d[0] * d[0] + d[1] * d[1] + d[2] * d[2];
