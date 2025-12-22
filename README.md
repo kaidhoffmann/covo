@@ -9,7 +9,7 @@ COVO (Correlations of Vector Orientations) is a C++ code for computing correlati
   - between a vector at one position and the separation vector pointing to another position (vector-position correlations)
 - Correlations are computed as a function of the distance between two positions
 - Both auto- and cross-correlations between two fields can be computed
-- Two vectors are assigned to each position, allowing for the computation of multiple correlations in one run for increased efficiency
+- Two vectors are assigned to each position, allowing for the computation of multiple correlations in one run
 - Operates in both cubical and spherical volumes
 - Includes a tree structure that serves two purposes:
   - Accelerated computation
@@ -25,8 +25,7 @@ If you use this code for your research, please provide a link to this repository
 ## Compilation
 
 ```bash
-cd src
-make
+make -C src
 ```
 
 The executable `covo` will be created in the project root directory.
@@ -34,6 +33,8 @@ The executable `covo` will be created in the project root directory.
 ## Usage
 
 ### Basic Usage
+
+COVO searches for pairs of objects belonging to two different input catalogues. The catalogues can be specified in the parameter file or provided as command-line arguments.
 
 **Option 1:** All parameters are specified by the parameter file
 ```bash
@@ -59,23 +60,21 @@ The executable `covo` will be created in the project root directory.
 
 Parameters are set and described in `covo.params`. See the parameter file for detailed documentation of all available options.
 
-## Input Catalogues
+## File Format
 
-The code searches for pairs of objects belonging to two different input catalogues.
-
-### Format
-
-Input files should be ASCII and contain information on the position and components of two vectors for each object:
+**Input files** are CSV files containing information on the position and components of two vectors for each object:
 
 ```
 x, y, z, vec_a_x, vec_a_y, vec_a_z, vec_b_x, vec_b_y, vec_b_z
 ```
 
-Both input catalogues must have the same format. Columns and column delimiter are set in the parameter file.
+Both input catalogues must have the same format. Column numbers and delimiters are configured in the parameter file.
+
+**Output files** are CSV files with one row per distance bin. The output format (header presence, delimiter, column selection) can be configured via parameters in the parameter file (`header_out`, `delim_out`).
 
 ## Regression Testing
 
-Tools for regression testing are available to ensure code changes do not alter numerical results. See [`REGRESSION_TESTING.md`](REGRESSION_TESTING.md) for details.
+Tools for regression testing are available to ensure code changes do not alter numerical results. See [`tests/README.md`](tests/README.md) for details.
 
 Run regression tests with:
 ```bash
