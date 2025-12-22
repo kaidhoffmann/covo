@@ -14,6 +14,7 @@ COVO (Correlations of Vector Orientations) is a C++ code for computing correlati
 - Includes a tree structure that serves two purposes:
   - Accelerated computation
   - Jackknife sampling for error estimation, using cubical grid cells or HEALPix cells for cubical or spherical volumes respectively
+- Parallel computation using OpenMP
 
 ## Citation
 
