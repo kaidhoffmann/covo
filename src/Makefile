@@ -28,8 +28,8 @@ covo: $(OBJ)
 clean:
 	rm -f $(OBJ) ../covo
 
-# Run regression tests
-test:
+# Run regression tests (builds first if needed)
+test: covo
 	@cd .. && bash tests/run_regression_tests.sh
 
 # Generate baseline for regression tests

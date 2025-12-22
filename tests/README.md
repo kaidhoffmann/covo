@@ -37,10 +37,7 @@ tests/
 From the project root directory:
 
 ```bash
-# Build the code first
-cd src && make && cd ..
-
-# Run regression tests
+# Run regression tests (builds automatically if needed)
 make -C src test
 # OR
 bash tests/run_regression_tests.sh
@@ -129,7 +126,7 @@ This makes it suitable for CI/CD pipelines:
 # Example GitHub Actions
 - name: Run regression tests
   run: |
-    cd src && make && cd ..
+    make -C src
     make -C src test
 ```
 

@@ -75,7 +75,7 @@ Both input catalogues must have the same format. Columns and column delimiter ar
 
 ## Regression Testing
 
-Tools for regression testing are available to ensure code changes do not alter numerical results. See [`REGRESSION_TESTING.md`](REGRESSION_TESTING.md) for details.
+Tools for regression testing are available to ensure code changes do not alter numerical results. See [`tests/README.md`](tests/README.md) for details.
 
 Run regression tests with:
 ```bash
