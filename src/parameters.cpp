@@ -441,11 +441,11 @@ std::string parameters::get_param(std::string fname_param_file, std::string para
 
             if (line[0] == '#' || line.empty())
                 continue;
-            
+
             auto delimiterPos = line.find("=");
             if (delimiterPos == std::string::npos)
                 continue;
-            
+
             auto var = line.substr(0, delimiterPos);
             auto val = line.substr(delimiterPos + 1);
 

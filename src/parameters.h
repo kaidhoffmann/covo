@@ -69,7 +69,7 @@ public:
     std::vector<double> x_lim_rand, y_lim_rand, z_lim_rand;
     std::vector<double> r_lim_rand, theta_lim_rand, phi_lim_rand;
 
-    int num_threads = 0;  // 0 = use OpenMP default (respects OMP_NUM_THREADS), >0 = specific number
+    int num_threads = 0; // 0 = use OpenMP default (respects OMP_NUM_THREADS), >0 = specific number
 };
 
 #endif // PARAMETERS_H

@@ -23,58 +23,58 @@
 
 namespace
 {
-inline double dot_arr_vec(const double *a, const std::vector<double> &b)
-{
-    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-}
-
-inline double dot_vec_vec(const std::vector<double> &a, const std::vector<double> &b)
-{
-    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-}
-
-inline double pow_exp(double v, double expip)
-{
-    double av = std::abs(v);
-    if (expip == 1.0)
-        return av;
-    if (expip == 2.0)
-        return av * av;
-    return pow(av, expip);
-}
-
-inline void print_progress_bar(int completed, int total)
-{
-    const int bar_width = 50;
-    const double percent = 100.0 * completed / total;
-    const int filled = static_cast<int>(bar_width * completed / total);
-    
-    std::cout << "\r# [";
-    for (int i = 0; i < bar_width; i++)
+    inline double dot_arr_vec(const double *a, const std::vector<double> &b)
     {
-        std::cout << (i < filled ? '=' : ' ');
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
     }
-    std::cout << "] " << static_cast<int>(percent) << "% (" << completed << "/" << total << ")";
-    std::cout.flush();
-}
 
-template<typename CounterType>
-inline void update_and_print_progress(CounterType& completed, int total)
-{
-    int count = ++completed;
+    inline double dot_vec_vec(const std::vector<double> &a, const std::vector<double> &b)
+    {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    }
+
+    inline double pow_exp(double v, double expip)
+    {
+        double av = std::abs(v);
+        if (expip == 1.0)
+            return av;
+        if (expip == 2.0)
+            return av * av;
+        return pow(av, expip);
+    }
+
+    inline void print_progress_bar(int completed, int total)
+    {
+        const int bar_width = 50;
+        const double percent = 100.0 * completed / total;
+        const int filled = static_cast<int>(bar_width * completed / total);
+
+        std::cout << "\r# [";
+        for (int i = 0; i < bar_width; i++)
+        {
+            std::cout << (i < filled ? '=' : ' ');
+        }
+        std::cout << "] " << static_cast<int>(percent) << "% (" << completed << "/" << total << ")";
+        std::cout.flush();
+    }
+
+    template <typename CounterType>
+    inline void update_and_print_progress(CounterType &completed, int total)
+    {
+        int count = ++completed;
 #ifdef _OPENMP
 #pragma omp critical
-    {
+        {
+            print_progress_bar(count, total);
+            if (count == total)
+                std::cout << std::endl;
+        }
+#else
         print_progress_bar(count, total);
         if (count == total)
             std::cout << std::endl;
-    }
-#else
-    print_progress_bar(count, total);
-    if (count == total)
-        std::cout << std::endl;
 #endif
-}
+    }
 } // namespace
 
 // ==========================================================
