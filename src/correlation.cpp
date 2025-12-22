@@ -12,6 +12,9 @@
 #include <algorithm>
 #include <functional> // std::divides
 #include <array>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 #include "parameters.h"
 #include "catalogue.h"
 #include "correlation.h"
@@ -321,22 +324,42 @@ void correlation::print_cell_num(const int DIM, const int i)
 // ==========================================================
 void correlation::sums_for_sample_combinations(const parameters p, catalogue &cat_1, catalogue &cat_2)
 {
-
     if (p.verbose > 1)
     {
         std::cout << "# remaining cells: " << std::endl;
     }
 
-    for (int i = 0; i < cat_1.samp.size(); i++)
-    {
+    const std::size_t n1 = cat_1.samp.size();
+    const std::size_t n2 = cat_2.samp.size();
+    sums_samps.resize(n1);
 
+#ifdef _OPENMP
+    if (p.num_threads > 0)
+    {
+        omp_set_num_threads(p.num_threads);
+    }
+
+#pragma omp parallel for schedule(dynamic)
+    for (int i = 0; i < static_cast<int>(n1); i++)
+    {
+        if (p.verbose > 1 && omp_get_thread_num() == 0)
+        {
+#pragma omp critical
+            {
+                print_cell_num(static_cast<int>(n1), i);
+            }
+        }
+#else
+    for (int i = 0; i < static_cast<int>(n1); i++)
+    {
         if (p.verbose > 1)
         {
-            print_cell_num(cat_1.samp.size(), i);
+            print_cell_num(static_cast<int>(n1), i);
         }
+#endif
 
         std::vector<vars> sums_i;
-        for (int j = 0; j < cat_2.samp.size(); j++)
+        for (std::size_t j = 0; j < n2; j++)
         {
 
             double dist_samps = min_samp_dist(p, cat_1.samp[i].edge, cat_2.samp[j].edge);
@@ -348,7 +371,7 @@ void correlation::sums_for_sample_combinations(const parameters p, catalogue &ca
             }
         }
 
-        sums_samps.push_back(sums_i);
+        sums_samps[i] = sums_i;
     }
 }
 
