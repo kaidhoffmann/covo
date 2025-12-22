@@ -354,7 +354,7 @@ void correlation::sums_for_sample_combinations(const parameters p, catalogue &ca
 #endif
     for (int i = 0; i < total; i++)
     {
-        if (p.verbose > 1)
+        if (p.verbose > 0)
         {
             update_and_print_progress(completed, total);
         }
