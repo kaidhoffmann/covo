@@ -68,14 +68,7 @@ cp tests/output/regression_test.csv tests/baseline/regression_test.csv
 make -C src test
 ```
 
-## Test Configuration
-
-The tests use parameter files (`covo.params.test_box_mode` and `covo.params.test_shell_mode`), which are optimized for:
-- **Fast execution**: Smaller bin counts and fewer jack-knife samples
-- **Deterministic results**: Fixed random seed, specific input files
-- **Comprehensive coverage**: Tests main correlation computation paths
-
-### Customizing Tests
+## Customizing Tests
 
 To add more test cases:
 
@@ -120,50 +113,7 @@ The test script exits with:
 - **0** on success
 - **1** on failure
 
-This makes it suitable for CI/CD pipelines:
-
-```yaml
-# Example GitHub Actions
-- name: Run regression tests
-  run: |
-    make -C src
-    make -C src test
-```
-
-## Troubleshooting
-
-### Tests Fail After Code Changes
-
-1. **Check if changes are intentional**: If you fixed a bug or improved an algorithm, the output may legitimately change.
-2. **Review differences**: The comparison script shows detailed differences.
-3. **Update baseline**: If changes are correct, update the baseline as described above.
-
-### Floating Point Differences
-
-Small floating-point differences (< 1e-5 relative) are normal due to:
-- Compiler optimizations
-- Different library versions
-- Numerical precision variations
-
-If differences are larger, investigate:
-- Algorithm changes
-- Input data differences
-- Parameter file changes
-
-### Missing Baseline
-
-If baseline files are missing:
-- First run will auto-generate them
-- Ensure `tests/baseline/` directory exists
-- Check file permissions
-
-## Best Practices
-
-1. **Keep baselines up to date**: Update baselines when making intentional changes
-2. **Review baselines carefully**: Don't commit incorrect baselines
-3. **Test frequently**: Run tests during development, not just before commits
-4. **Document test cases**: Add comments explaining what each test validates
-5. **Version control**: Commit baseline files to git so all developers use the same references
+This makes it suitable for CI/CD pipelines. See [`.github/workflows/regression.yml`](../.github/workflows/regression.yml) for the GitHub Actions workflow.
 
 ## Adding New Test Cases
 
@@ -183,17 +133,3 @@ To add a new test case:
 
 4. **Document**:
    Add a comment in the test runner explaining what the test validates
-
-## File Format
-
-COVO output files are space-delimited with:
-- Header line starting with `#`
-- Data columns: bin, r, counts, correlation_values, error_values
-- One row per distance bin
-
-The comparison script handles:
-- Header parsing
-- Comment line skipping
-- Column-by-column comparison
-- Detailed difference reporting
-
