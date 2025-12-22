@@ -2,6 +2,12 @@
 # set zero for silence
 verbose = 3
 
+# ==== number of threads for parallel execution ====
+# Number of CPU threads to use for parallel computation
+# 0 = use all available CPU cores (default)
+# >0 = use exactly this many threads (e.g., 4 for 4 threads)
+num_threads = 4
+
 
 # ==== input catalogues ====
 fname_cat_1 = ./catalogues/random_1.csv

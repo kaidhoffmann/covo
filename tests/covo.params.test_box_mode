@@ -5,6 +5,12 @@
 # set zero for silence
 verbose = 1
 
+# ==== number of threads for parallel execution ====
+# Number of CPU threads to use for parallel computation
+# 0 = use all available CPU cores (default)
+# >0 = use exactly this many threads (e.g., 4 for 4 threads)
+num_threads = 0
+
 # ==== input catalogues ====
 # Using files from run_covo_hagn.sh (box mode)
 fname_cat_1 = ./tests/data/box_mode_cat1.csv
