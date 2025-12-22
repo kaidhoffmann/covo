@@ -58,8 +58,6 @@ class correlation
 
     void jk_errors(const parameters p);
 
-    void print_cell_num(const int DIM, const int i);
-
 public:
     std::vector<std::vector<vars>> sums_samps;
 

@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <functional> // std::divides
 #include <array>
+#include <atomic>
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -40,6 +41,39 @@ inline double pow_exp(double v, double expip)
     if (expip == 2.0)
         return av * av;
     return pow(av, expip);
+}
+
+inline void print_progress_bar(int completed, int total)
+{
+    const int bar_width = 50;
+    const double percent = 100.0 * completed / total;
+    const int filled = static_cast<int>(bar_width * completed / total);
+    
+    std::cout << "\r# [";
+    for (int i = 0; i < bar_width; i++)
+    {
+        std::cout << (i < filled ? '=' : ' ');
+    }
+    std::cout << "] " << static_cast<int>(percent) << "% (" << completed << "/" << total << ")";
+    std::cout.flush();
+}
+
+template<typename CounterType>
+inline void update_and_print_progress(CounterType& completed, int total)
+{
+    int count = ++completed;
+#ifdef _OPENMP
+#pragma omp critical
+    {
+        print_progress_bar(count, total);
+        if (count == total)
+            std::cout << std::endl;
+    }
+#else
+    print_progress_bar(count, total);
+    if (count == total)
+        std::cout << std::endl;
+#endif
 }
 } // namespace
 
@@ -297,66 +331,33 @@ correlation::vars correlation::sums_pairs(
     return sums_samp;
 }
 
-//===========================================================
-// print cell number when searching pairs
-//===========================================================
-void correlation::print_cell_num(const int DIM, const int i)
-{
-
-    if (i == 0)
-    {
-        std::cout << "# ";
-    }
-    if (i > 0)
-    {
-        std::cout << DIM - i << "; ";
-        std::cout.flush();
-        if (i % 20 == 0)
-        {
-            std::cout << std::endl
-                      << "# ";
-        }
-    }
-}
-
 // ==========================================================
 // search for pairs in all samples with distance r < r_max
 // ==========================================================
 void correlation::sums_for_sample_combinations(const parameters p, catalogue &cat_1, catalogue &cat_2)
 {
-    if (p.verbose > 1)
-    {
-        std::cout << "# remaining cells: " << std::endl;
-    }
-
     const std::size_t n1 = cat_1.samp.size();
     const std::size_t n2 = cat_2.samp.size();
     sums_samps.resize(n1);
+
+    const int total = static_cast<int>(n1);
 
 #ifdef _OPENMP
     if (p.num_threads > 0)
     {
         omp_set_num_threads(p.num_threads);
     }
-
+    std::atomic<int> completed(0);
 #pragma omp parallel for schedule(dynamic)
-    for (int i = 0; i < static_cast<int>(n1); i++)
-    {
-        if (p.verbose > 1 && omp_get_thread_num() == 0)
-        {
-#pragma omp critical
-            {
-                print_cell_num(static_cast<int>(n1), i);
-            }
-        }
 #else
-    for (int i = 0; i < static_cast<int>(n1); i++)
+    int completed = 0;
+#endif
+    for (int i = 0; i < total; i++)
     {
         if (p.verbose > 1)
         {
-            print_cell_num(static_cast<int>(n1), i);
+            update_and_print_progress(completed, total);
         }
-#endif
 
         std::vector<vars> sums_i;
         for (std::size_t j = 0; j < n2; j++)
