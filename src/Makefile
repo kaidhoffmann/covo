@@ -1,37 +1,38 @@
-LDFLAGS = -std=c++11 -O3
-CC      = g++
+# Compiler and flags
+CXX      = g++
+CXXFLAGS = -std=c++11 -O3 -fopenmp
+LDFLAGS  = -fopenmp
 
+# Object files
+OBJ = main.o parameters.o directory.o healpix.o catalogue.o correlation.o
 
-OBJ = main.o parameters.o directory.o healpix.o catalogue.o  correlation.o
+#------------------------------------------------------
+# Build targets
 #------------------------------------------------------
 
+# Main executable
 covo: $(OBJ)
-	$(CC) -o ../covo $(OBJ)
+	$(CXX) -o ../covo $(OBJ) $(LDFLAGS)
 
-main.o: main.cpp
-	${CC} -c main.cpp ${LDFLAGS}
+# Compile .cpp files to .o files
+%.o: %.cpp
+	$(CXX) -c $< $(CXXFLAGS)
 
-parameters.o: parameters.cpp
-	${CC} -c parameters.cpp ${LDFLAGS}
-	
-directory.o: directory.cpp
-	${CC} -c directory.cpp ${LDFLAGS}
+#------------------------------------------------------
+# Utility targets
+#------------------------------------------------------
 
-catalogue.o: catalogue.cpp
-	${CC} -c catalogue.cpp ${LDFLAGS}
+.PHONY: clean test test-baseline
 
-correlation.o: correlation.cpp
-	${CC} -c correlation.cpp ${LDFLAGS}
+# Remove all build artifacts
+clean:
+	rm -f $(OBJ) ../covo
 
-healpix.o: healpix.cpp
-	${CC} -c healpix.cpp ${LDFLAGS}
-
-# Regression testing
-.PHONY: test
+# Run regression tests
 test:
 	@cd .. && bash tests/run_regression_tests.sh
 
-.PHONY: test-baseline
+# Generate baseline for regression tests
 test-baseline:
 	@cd .. && bash tests/run_regression_tests.sh || true
 	@echo "Baseline generation complete. Review tests/baseline/ before committing."
