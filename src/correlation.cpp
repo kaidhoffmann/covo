@@ -336,11 +336,9 @@ correlation::vars correlation::sums_pairs(
 // ==========================================================
 void correlation::sums_for_sample_combinations(const parameters p, catalogue &cat_1, catalogue &cat_2)
 {
-    const std::size_t n1 = cat_1.samp.size();
+    const int n1 = static_cast<int>(cat_1.samp.size());
     const std::size_t n2 = cat_2.samp.size();
     sums_samps.resize(n1);
-
-    const int total = static_cast<int>(n1);
 
 #ifdef _OPENMP
     if (p.num_threads > 0)
@@ -352,11 +350,11 @@ void correlation::sums_for_sample_combinations(const parameters p, catalogue &ca
 #else
     int completed = 0;
 #endif
-    for (int i = 0; i < total; i++)
+    for (int i = 0; i < n1; i++)
     {
         if (p.verbose > 0)
         {
-            update_and_print_progress(completed, total);
+            update_and_print_progress(completed, n1);
         }
 
         std::vector<vars> sums_i;
@@ -719,10 +717,10 @@ void correlation::compute(const parameters p, catalogue &cat_1, catalogue &cat_2
     // normalize total
     normalize_total(p);
 
-    // normalize jk
+    // normalize jk samples
     normalize_jk(p);
 
-    // normalize jk
+    // jack-knife estimates for standard deviation
     jk_errors(p);
 
     time_t end;
