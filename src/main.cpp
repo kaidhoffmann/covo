@@ -214,7 +214,7 @@ int main(int argc, char **argv)
     //===============================
     if (p.verbose > 1)
         std::cout << std::endl
-                  << "# ==== compute correlation ==== " << std::endl;
+                  << "# computing correlation" << std::endl;
     //===============================
     correlation corr;
 

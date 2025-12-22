@@ -10,6 +10,9 @@
 #include <algorithm>
 #include <vector>
 #include <cmath>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 #include "parameters.h"
 #include "toolbox.h"
 
@@ -113,6 +116,9 @@ void parameters::read(std::string fname)
     r_lim_rand = r_lim;
     theta_lim_rand = theta_lim;
     phi_lim_rand = phi_lim;
+
+    // number of OpenMP threads (0 means use OpenMP default, which respects OMP_NUM_THREADS)
+    num_threads = std::stoi(get_param(fname, "num_threads"));
 };
 
 //===========================================================
@@ -225,6 +231,18 @@ bool parameters::check()
             eishockey = false;
         }
     }
+
+#ifdef _OPENMP
+    if (num_threads > 0)
+    {
+        int max_threads = omp_get_max_threads();
+        if (num_threads > max_threads)
+        {
+            std::cerr << "# ##### ERROR: num_threads (" << num_threads << ") exceeds maximum available threads (" << max_threads << ") #####" << std::endl;
+            eishockey = false;
+        }
+    }
+#endif
 
     std::cout << std::endl;
 
@@ -423,7 +441,11 @@ std::string parameters::get_param(std::string fname_param_file, std::string para
 
             if (line[0] == '#' || line.empty())
                 continue;
+
             auto delimiterPos = line.find("=");
+            if (delimiterPos == std::string::npos)
+                continue;
+
             auto var = line.substr(0, delimiterPos);
             auto val = line.substr(delimiterPos + 1);
 
