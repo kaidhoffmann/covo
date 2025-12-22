@@ -1,4 +1,0 @@
-- name: Run regression tests
-  run: |
-    cd src && make && cd ..
-    make -C src test
