@@ -6,14 +6,13 @@ COVO stands for "Correlations of Vector Orientations" and is a C++ code for comp
 
 COVO computes two types of correlations:
 
-$$\eta_{vv}(r) = \langle |{\bf \hat{v}}_{a} \cdot {\bf \hat{v}_b}|^{\gamma}\rangle (r) \ ,$$
+$$\eta_{vv}(r) = \langle |{\bf \hat v}_{a} \cdot {\bf \hat v}_{b}|^{\gamma}\rangle (r) \ ,$$
 
 and
 
-$$\eta_{vr}(r) = \langle |{\bf \hat{v}}_{a} \cdot {\bf \hat{r}_{ab}}|^{\gamma}\rangle (r) \ ,$$
+$$\eta_{vr}(r) = \langle |{\bf \hat v}_{a} \cdot {\bf \hat r}_{ab}|^{\gamma}\rangle (r) \ ,$$
 
-where ${\bf \hat{v}}_{a}$ and ${\bf \hat{v}}_{b}$ are normalized three-dimensional vectors at positions $a$ and $b$, ${\bf \hat r}_{ab}$ is the normalized distance vector pointing from position $a$ to position $b$, and $\langle \dots \rangle$ denotes the average over all possible vector pairs separated by distance $r = | {\bf r}_{ab} |$. The exponent $\gamma$ is typically set to $1$ or $2$, resulting in $\eta(r)=1/2$ or $\eta(r)=1/3$ for randomly oriented vectors.
-
+where **v̂**<sub>a</sub> and **v̂**<sub>b</sub> are normalized three-dimensional vectors at positions *a* and *b*, **r̂**<sub>ab</sub> is the normalized distance vector pointing from position *a* to position *b*, and ⟨…⟩ denotes the average over all possible vector pairs separated by distance *r* = |**r**<sub>ab</sub>|. The exponent *γ* is typically set to 1 or 2, resulting in *η*(*r*)=1/2 or *η*(*r*)=1/3 for randomly oriented vectors.
 ## Features
 
 - Both auto- and cross-correlations between two fields can be computed
