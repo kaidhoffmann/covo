@@ -1,24 +1,29 @@
 # COVO
 
-COVO (Correlations of Vector Orientations) is a C++ code for computing correlation functions of 3D vector fields sampled at discrete particle positions.
+COVO stands for "Correlations of Vector Orientations" and is a C++ code for computing two-point correlations of 3D vector fields sampled at discrete particle positions.
+
+## Definitions
+
+COVO computes two types of correlations:
+
+$$\eta_{vv}(r) = \langle |{\bf \hat{v}}_{a} \cdot {\bf \hat{v}_b}|^{\gamma}\rangle (r) \ ,$$
+
+and
+
+$$\eta_{vr}(r) = \langle |{\bf \hat{v}}_{a} \cdot {\bf \hat{r}_{ab}}|^{\gamma}\rangle (r) \ ,$$
+
+where ${\bf \hat{v}}_{a}$ and ${\bf \hat{v}}_{b}$ are normalized three-dimensional vectors at positions $a$ and $b$, ${\bf \hat r}_{ab}$ is the normalized distance vector pointing from position $a$ to position $b$, and $\langle \dots \rangle$ denotes the average over all possible vector pairs separated by distance $r = | {\bf r}_{ab} |$. The exponent $\gamma$ is typically set to $1$ or $2$, resulting in $\eta(r)=1/2$ or $\eta(r)=1/3$ for randomly oriented vectors.
 
 ## Features
 
-- Measures correlations of discrete vector fields as the average inner product:
-  - between vectors at two different positions (vector-vector correlations)
-  - between a vector at one position and the separation vector pointing to another position (vector-position correlations)
-- Correlations are computed as a function of the distance between two positions
 - Both auto- and cross-correlations between two fields can be computed
 - Two vectors are assigned to each position, allowing for the computation of multiple correlations in one run
 - Operates in both cubical and spherical volumes
-- Includes a tree structure that serves two purposes:
+- Includes a simple spatial tree structure (using cubical grid cells or HEALPix cells for cubical or spherical volumes respectively) that serves two purposes:
   - Accelerated computation
-  - Jackknife sampling for error estimation, using cubical grid cells or HEALPix cells for cubical or spherical volumes respectively
-- Parallel computation using OpenMP
+  - Jackknife sampling for error estimation
+- Parallel computation on shared memory using OpenMP
 
-## Citation
-
-If you use this code for your research, please provide a link to this repository when publishing the results.
 
 ---
 
@@ -80,3 +85,8 @@ Run regression tests with:
 ```bash
 make -C src test
 ```
+
+## Reference
+
+If you use this code for your research, please provide a link to this repository when publishing the results.
+
